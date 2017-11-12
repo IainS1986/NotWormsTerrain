@@ -12,13 +12,17 @@ public class VertexSequence
     public Point this[int i]{
         get
         {
+            if (i < 0)
+                i += Vertices.Count;
+
             return Vertices[i % Vertices.Count];
-            //return Vertices[((i % Vertices.Count) + Vertices.Count) % Vertices.Count];
         }
         set
         {
+            if (i < 0)
+                i += Vertices.Count;
+
             Vertices[i % Vertices.Count] = value;
-            //Vertices[((i % Vertices.Count) + Vertices.Count) % Vertices.Count] = value;
         }
     }
     

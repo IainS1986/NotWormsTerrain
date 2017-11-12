@@ -74,17 +74,6 @@ public class Main : MonoBehaviour
             m_groundGenerator.RemoveVertices();
             m_groundGenerator.Decomp();
         }, b, w, h);
-        AddButton(i++, "ALL x1000", () =>
-        {
-            for (int j = 0; j < 1000; j++)
-            {
-                m_groundGenerator.Generate();
-                m_groundGenerator.March();
-                m_groundGenerator.SmoothContours();
-                m_groundGenerator.RemoveVertices();
-                m_groundGenerator.Decomp();
-            }
-        }, b, w, h);
     }
 
     private void AddButton(int i, string s, Action action, int b, int w, int h)

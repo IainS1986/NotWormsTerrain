@@ -96,7 +96,7 @@ public class GroundGenerator
                 int yy = j;
                 if (xx < 0 || xx >= Width) continue;
                 if (yy < 0 || yy >= Height) continue;
-                if (Ground[yy,xx] == type) continue;
+                if (this[yy,xx] == type) continue;
                 return true;
             }
         }
@@ -219,14 +219,14 @@ public class GroundGenerator
         {
             for (int y = yy; y < yy + hh; y++)
             {
-                if (x > 0 && Ground[y,x] == Ground[y,x - 1]) continue;//Left
-                if (x < Width - 1 && Ground[y,x] == Ground[y,x + 1]) continue;//Right
-                if (y > 0 && Ground[y,x] == Ground[y - 1,x]) continue;//Up
-                if (y < Height - 1 && Ground[y,x] == Ground[y + 1,x]) continue;//Down
-                if (x > 0 && y > 0 && Ground[y,x] == Ground[y - 1,x - 1]) continue;//TopLeft
-                if (x < Width - 1 && y > 0 && Ground[y,x] == Ground[y - 1,x + 1]) continue;//TopRight
-                if (x > 0 && y < Height - 1 && Ground[y,x] == Ground[y + 1,x - 1]) continue;//BotLeft
-                if (x < Width - 1 && y < Height - 1 && Ground[y,x] == Ground[y + 1,x + 1]) continue;//BotRight
+                if (x > 0 && this[y,x] == this[y,x - 1]) continue;//Left
+                if (x < Width - 1 && this[y,x] == this[y,x + 1]) continue;//Right
+                if (y > 0 && this[y,x] == this[y - 1,x]) continue;//Up
+                if (y < Height - 1 && this[y,x] == this[y + 1,x]) continue;//Down
+                if (x > 0 && y > 0 && this[y,x] == this[y - 1,x - 1]) continue;//TopLeft
+                if (x < Width - 1 && y > 0 && this[y,x] == this[y - 1,x + 1]) continue;//TopRight
+                if (x > 0 && y < Height - 1 && this[y,x] == this[y + 1,x - 1]) continue;//BotLeft
+                if (x < Width - 1 && y < Height - 1 && this[y,x] == this[y + 1,x + 1]) continue;//BotRight
                 //Remove
                 int totair = 0;
                 int totearth = 0;
@@ -251,9 +251,9 @@ public class GroundGenerator
                         }
                     }
                 }
-                if (totair > totearth && totair > totstone) Ground[y,x] = (int)GroundType.Air;
-                else if (totearth > totair && totearth > totstone) Ground[y,x] = (int)GroundType.Earth;
-                else Ground[y,x] = (int)GroundType.Stone;
+                if (totair > totearth && totair > totstone) this[y,x] = (int)GroundType.Air;
+                else if (totearth > totair && totearth > totstone) this[y,x] = (int)GroundType.Earth;
+                else this[y,x] = (int)GroundType.Stone;
             }
         }
     }
@@ -269,8 +269,8 @@ public class GroundGenerator
                    && GroundValue(x, y) != GroundValue(x, y + 1))
                 {
                     //Remove diagonals
-                    Ground[y,x] = (int)GroundValue(x + 1, y);
-                    Ground[y + 1,x + 1] = (int)GroundValue(x, y + 1);
+                    this[y,x] = (int)GroundValue(x + 1, y);
+                    this[y + 1,x + 1] = (int)GroundValue(x, y + 1);
                 }
             }
         }
@@ -285,8 +285,8 @@ public class GroundGenerator
                    && GroundValue(x + 1, y) != GroundValue(x, y))
                 {
                     //Remove diagonals
-                    Ground[y, x + 1] = (int)GroundValue(x + 1, y + 1);
-                    Ground[y + 1, x] = (int)GroundValue(x, y);
+                    this[y, x + 1] = (int)GroundValue(x + 1, y + 1);
+                    this[y + 1, x] = (int)GroundValue(x, y);
                 }
             }
         }
@@ -480,10 +480,10 @@ public class GroundGenerator
                 if (yy < 0 || yy >= Height)
                     continue;
 
-                if (Ground[yy, xx] == type)
+                if (this[yy, xx] == type)
                     continue;
 
-                Ground[yy, xx] = type;
+                this[yy, xx] = type;
                 change = true;
             }
         }
@@ -512,10 +512,10 @@ public class GroundGenerator
                 if((xx-x)*(xx-x) + (yy-y)*(yy-y) > rpow)
                     continue;
 
-                if (Ground[yy, xx] == type)
+                if (this[yy, xx] == type)
                     continue;
 
-                Ground[yy, xx] = type;
+                this[yy, xx] = type;
                 change = true;
             }
         }
@@ -527,7 +527,7 @@ public class GroundGenerator
         if (x < 0 || y < 0 || x >= Width || y >= Height)
             return GroundType.Air;
         else
-            return (GroundType)Ground[y, x];
+            return (GroundType)this[y, x];
     }
 
     public void SmoothContours()
