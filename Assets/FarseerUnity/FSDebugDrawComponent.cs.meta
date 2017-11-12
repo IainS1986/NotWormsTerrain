@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: 334722ce61b1c4801b2d44dc10ff0bc4
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - GLMaterial: {fileID: 2100000, guid: 3010220a19d374ba298ed24cad73a182, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
