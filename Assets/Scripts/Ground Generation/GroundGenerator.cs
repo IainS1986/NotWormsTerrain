@@ -9,12 +9,6 @@ using UnityEngine;
 using Common;
 using Poly2Tri.Triangulation.Delaunay;
 
-public class Decomp
-{
-    public List<Point> Points;
-    public int[] Tris;
-}
-
 public class GroundGenerator 
 {
     public enum GroundStage

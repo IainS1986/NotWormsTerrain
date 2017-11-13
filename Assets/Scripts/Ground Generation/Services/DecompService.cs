@@ -6,6 +6,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public class Decomp
+{
+    public List<Point> Points;
+    public int[] Tris;
+}
+
 public class DecompService : IDecompService
 {
     public void Decomp(ref List<GroundChunk> chunks)
