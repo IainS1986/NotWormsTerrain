@@ -2,15 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IMarchingService : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+public interface IMarchingService
+{
+    List<GroundChunk> March(int xx, int yy, int ww, int hh, int[,] ground, ref int[,] groundToChunk, ref Dictionary<int, GroundChunk> idToChunk);
 }
