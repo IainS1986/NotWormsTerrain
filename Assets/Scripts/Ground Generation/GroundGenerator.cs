@@ -118,6 +118,7 @@ public class GroundGenerator
         int miny = int.MaxValue;
 
         //Check and remove effected Chunks
+        Dictionary<int, bool> chunkIdsToRemove = new Dictionary<int, bool>();
         for (int i = 0; i < s + (border * 2); i++)
         {
             int xx = x - border + i;
@@ -131,29 +132,32 @@ public class GroundGenerator
                     if (xx < minx) minx = xx;
                     if (yy < miny) miny = yy;
 
-                    if (GroundToChunk[yy, xx] != 0)
+                    if (GroundToChunk[yy, xx] != 0 && !chunkIdsToRemove.ContainsKey(GroundToChunk[yy, xx]))
                     {
-                        int chunkId = GroundToChunk[yy, xx];
-                        GroundChunk chunk = IDToChunk[chunkId];
-                        //Destroy chunk
-                        Chunks.Remove(chunk);
-                        IDToChunk.Remove(chunkId);
-                        //Clear GroundToChunk values (Quicker way to do this?)
-                        for (int a = 0; a < Width; a++)
-                            for (int b = 0; b < Height; b++)
-                                if (GroundToChunk[b, a] == chunkId)
-                                    GroundToChunk[b, a] = 0;
+                        chunkIdsToRemove.Add(GroundToChunk[yy, xx], true);
                     }
                 }
             }
         }
 
+        //Clear ChunkID lookups
+        foreach(var id in chunkIdsToRemove)
+        {
+            GroundChunk chunk = IDToChunk[id.Key];
+            //Destroy chunk
+            Chunks.Remove(chunk);
+            IDToChunk.Remove(id.Key);
+        }
+        //Clear GroundToChunk values (Quicker way to do this?)
+        for (int a = 0; a < Width; a++)
+            for (int b = 0; b < Height; b++)
+                if (chunkIdsToRemove.ContainsKey(GroundToChunk[b, a]))
+                    GroundToChunk[b, a] = 0;
+
         //Preprocess
         DotRemoval(minx, miny, s + (border * 2), s + (border * 2));
         RemoveDiagonals(minx, miny, s + (border * 2), s + (border * 2));
 
-        //We remarch the whole map, however dots outside the region we are rebuilding will be marked
-        //as part of a Chunk, so only the newly "blanked" dots will trigger a remarch.
         List<GroundChunk> chunks = March(0, 0, Width, Height);
 
         if (CurrentStage >= GroundStage.SMOOTHED)
@@ -274,22 +278,6 @@ public class GroundGenerator
                 }
             }
         }
-
-        //TEST
-        for (int x = 0; x < Width; x++)
-        {
-            for (int y = 0; y < Height; y++)
-            {
-                if ((GroundValue(x + 1, y) == GroundValue(x, y + 1))
-                   && GroundValue(x + 1, y) != GroundValue(x + 1, y + 1)
-                   && GroundValue(x + 1, y) != GroundValue(x, y))
-                {
-                    //Remove diagonals
-                    this[y, x + 1] = (int)GroundValue(x + 1, y + 1);
-                    this[y + 1, x] = (int)GroundValue(x, y);
-                }
-            }
-        }
     }
 
     public void March()
@@ -304,9 +292,9 @@ public class GroundGenerator
     {
         List<GroundChunk> chunks = new List<GroundChunk>();
 
-        for (int y=yy; y < hh; y++)
+        for (int y=yy; y < yy + hh; y++)
         {
-            for (int x=xx; x < ww; x++)
+            for (int x=xx; x < xx + ww; x++)
             {
                 int g = this[y,x];
                 int c = GroundToChunk[y,x];

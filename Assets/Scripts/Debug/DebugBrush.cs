@@ -14,7 +14,9 @@ public class DebugBrush : MonoBehaviour {
 
 
     public Brush m_brush = Brush.NONE;
-    public int m_size = 2;
+
+    [SerializeField]
+    private int m_size = 2;
 
     [SerializeField]
     private Main m_main;
