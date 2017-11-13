@@ -232,32 +232,7 @@ public class GroundGenerator
                 if (x > 0 && y < Height - 1 && this[y,x] == this[y + 1,x - 1]) continue;//BotLeft
                 if (x < Width - 1 && y < Height - 1 && this[y,x] == this[y + 1,x + 1]) continue;//BotRight
                 //Remove
-                int totair = 0;
-                int totearth = 0;
-                int totstone = 0;
-                for (int i = -1; i <= 1; i++)
-                {
-                    for (int j = -1; j <= 1; j++)
-                    {
-                        if (i == 0 && j == 0) continue;
-                        GroundType g = GroundValue(x + i, y + j);
-                        switch (g)
-                        {
-                            case GroundType.Air:
-                                totair++;
-                                break;
-                            case GroundType.Earth:
-                                totearth++;
-                                break;
-                            case GroundType.Stone:
-                                totstone++;
-                                break;
-                        }
-                    }
-                }
-                if (totair > totearth && totair > totstone) this[y,x] = (int)GroundType.Air;
-                else if (totearth > totair && totearth > totstone) this[y,x] = (int)GroundType.Earth;
-                else this[y,x] = (int)GroundType.Stone;
+                this[y, x] = this[y, x - 1];
             }
         }
     }
@@ -268,13 +243,13 @@ public class GroundGenerator
         {
             for (int y = yy; y < yy + hh; y++)
             {
-                if ((GroundValue(x, y) == GroundValue(x + 1, y + 1))
-                   && GroundValue(x, y) != GroundValue(x + 1, y)
-                   && GroundValue(x, y) != GroundValue(x, y + 1))
+                if(this[y,x] == this[y + 1, x + 1] &&
+                    this[y,x] != this[y, x + 1] &&
+                    this[y,x] != this[y + 1, x])
                 {
                     //Remove diagonals
-                    this[y,x] = (int)GroundValue(x + 1, y);
-                    this[y + 1,x + 1] = (int)GroundValue(x, y + 1);
+                    this[y,x] = this[y, x + 1];
+                    this[y + 1,x + 1] = this[y + 1, x];
                 }
             }
         }
@@ -508,14 +483,6 @@ public class GroundGenerator
             }
         }
         return change;
-    }
-
-    private GroundType GroundValue(int x, int y)
-    {
-        if (x < 0 || y < 0 || x >= Width || y >= Height)
-            return GroundType.Air;
-        else
-            return (GroundType)this[y, x];
     }
 
     public void SmoothContours()
