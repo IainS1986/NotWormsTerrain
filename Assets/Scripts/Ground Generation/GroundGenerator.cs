@@ -29,14 +29,13 @@ public class GroundGenerator
         LIPS,
     };
 
-    public enum GroundType
-    {
-        Air,
-        Earth,
-        Stone,
-    }
+    IGroundGeneratorService m_groundGeneratorService;
+    IMarchingService m_marchingSquaresService;
+    IContourSmoothingService m_contourSmoothingService;
+    IDecompService m_decompService;
 
-	private int TotalMaterials { get; set; }
+
+    private int TotalMaterials { get; set; }
 	private int Seed { get; set; }
 
     private int[] m_chunk = new int[]{2,2};

@@ -7,9 +7,9 @@ public class DebugBrush : MonoBehaviour {
     public enum Brush
     {
         NONE = -1,
-        AIR = GroundGenerator.GroundType.Air,
-        EARTH = GroundGenerator.GroundType.Earth,
-        STONE = GroundGenerator.GroundType.Stone,
+        AIR = 0,
+        EARTH = 1,
+        STONE = 2,
     };
 
 
