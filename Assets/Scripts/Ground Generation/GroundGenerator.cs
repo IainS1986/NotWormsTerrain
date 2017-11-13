@@ -35,25 +35,7 @@ public class GroundGenerator
     public int Width { get; private set; }
     public List<GroundChunk> Chunks { get; private set; }
     public GroundStage CurrentStage { get; set; }
-
-    /*public int this[int y, int x]{
-        get
-        {
-            if(y<0 || y >= Height || x < 0 || x >= Width || Ground == null)
-                return -1;
-
-            return Ground[y,x];
-        }
-        set
-        { 
-            if(y<0 || y >= Height || x < 0 || x >= Width || Ground == null)
-                return;
-
-            Ground[y,x] = value;
-        }
-    }*/
-
-	public GroundGenerator(){}
+    
 	public GroundGenerator(int _width, int _height)
     {
 		Height = _height;
