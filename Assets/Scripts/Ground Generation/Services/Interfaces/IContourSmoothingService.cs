@@ -2,15 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IContourSmoothingService : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+public interface IContourSmoothingService
+{
+    void SmoothContours(ref List<GroundChunk> chunks);
+    void RemoveVertices(ref List<GroundChunk> chunks);
 }
