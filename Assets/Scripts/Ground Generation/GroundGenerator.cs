@@ -73,7 +73,7 @@ public class GroundGenerator
 
     public void GroundChangeSelectiveRebuild(int x, int y, int s, int type)
     {
-        bool change = SafeGroundFill(x, y, s, type);
+        bool change = m_groundGeneratorService.SafeGroundFillForGenerator(x, y, s, type,Width,Height, ref Ground);
 
         if (!change)
             return;
@@ -123,22 +123,22 @@ public class GroundGenerator
                     GroundToChunk[b, a] = 0;
 
         //Preprocess
-        DotRemoval(minx, miny, s + (border * 2), s + (border * 2));
-        RemoveDiagonals(minx, miny, s + (border * 2), s + (border * 2));
+        m_groundGeneratorService.DotRemoval(minx, miny, s + (border * 2), s + (border * 2), Width, Height, ref Ground);
+        m_groundGeneratorService.RemoveDiagonals(minx, miny, s + (border * 2), s + (border * 2), ref Ground);
 
-        List<GroundChunk> chunks = March(0, 0, Width, Height);
+        List<GroundChunk> chunks = m_marchingSquaresService.March(0,0,Width, Height, Ground, ref GroundToChunk, ref IDToChunk);
 
         if (CurrentStage >= GroundStage.SMOOTHED)
         {
-            SmoothContours(chunks);     
+            m_contourSmoothingService.SmoothContours(ref Chunks);  
         }
         if (CurrentStage >= GroundStage.VERTEX_REMOVAL)
         {
-            RemoveVertices(chunks);
+            m_contourSmoothingService.RemoveVertices(ref Chunks);
         }
         if (CurrentStage >= GroundStage.DECOMP)
         {
-            Decomp(chunks);
+            m_decompService.Decomp(ref Chunks);
         }
 
         Chunks.AddRange(chunks);
