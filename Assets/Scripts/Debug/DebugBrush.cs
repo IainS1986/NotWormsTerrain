@@ -105,10 +105,10 @@ public class DebugBrush : MonoBehaviour {
             int xx = UnityEngine.Mathf.FloorToInt(pos.x);
             int yy = UnityEngine.Mathf.FloorToInt(pos.y);
             float s = m_size;
-            GL.Vertex3(xx, yy, 0);
-            GL.Vertex3(xx + s, yy, 0);
+            GL.Vertex3(xx - s, yy - s, 0);
+            GL.Vertex3(xx + s, yy - s, 0);
             GL.Vertex3(xx + s, yy + s, 0);
-            GL.Vertex3(xx, yy + s, 0);
+            GL.Vertex3(xx - s, yy + s, 0);
             GL.End();
         }
     }
