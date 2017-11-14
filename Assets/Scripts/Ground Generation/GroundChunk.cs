@@ -17,10 +17,27 @@ public class GroundChunk
 
     public Decomp Poly { get; set; }
 
+    public Mesh Mesh { get; set; }
+
+    public GameObject GameObject { get; set; }
+
     public int GroundType { get; set; }
 
     public GroundChunk()
     {
         Holes = new List<VertexSequence>();
 	}
+
+    public void Dispose()
+    {
+        if(Mesh!= null)
+        {
+            MonoBehaviour.Destroy(Mesh);
+        }
+
+        if(GameObject!= null)
+        {
+            MonoBehaviour.Destroy(GameObject);
+        }
+    }
 }

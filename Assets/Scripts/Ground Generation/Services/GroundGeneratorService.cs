@@ -13,6 +13,12 @@ public class GroundGeneratorService : IGroundGeneratorService
 
     public void Generate(Ground ground)
     {
+        if(ground.Chunks!= null)
+        {
+            foreach (var chunks in ground.Chunks)
+                chunks.Value.Dispose();
+        }
+
         ground.Chunks = new Dictionary<int, GroundChunk>();
         ground.Dots = new Dot[ground.Height, ground.Width];
         var seed = (int)System.DateTime.Now.Ticks;
@@ -52,8 +58,14 @@ public class GroundGeneratorService : IGroundGeneratorService
     {
         for (int x = xx; x < xx + ww; x++)
         {
+            if (x >= ground.Width)
+                continue;
+
             for (int y = yy; y < yy + hh; y++)
             {
+                if (y >= ground.Height)
+                    continue;
+
                 if (x > 0 && ground.Dots[y, x].Value == ground.Dots[y, x - 1].Value) continue;//Left
                 if (x < ground.Width - 1 && ground.Dots[y, x].Value == ground.Dots[y, x + 1].Value) continue;//Right
                 if (y > 0 && ground.Dots[y, x].Value == ground.Dots[y - 1, x].Value) continue;//Up

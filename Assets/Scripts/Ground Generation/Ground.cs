@@ -22,6 +22,11 @@ public class Ground
 
     public void ResetChunks()
     {
+        if(Chunks!= null)
+        {
+            foreach (var chunk in Chunks)
+                chunk.Value.Dispose();
+        }
         Chunks = new Dictionary<int, GroundChunk>();
         for(int y = 0; y<Height; y++)
         {

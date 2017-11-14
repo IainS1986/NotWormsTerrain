@@ -23,6 +23,7 @@ public class DecompService : IDecompService
     {
         foreach (var chunk in chunks)
         {
+            chunk.Value.Dispose();
             Decomp(chunk.Value);
         }
     }

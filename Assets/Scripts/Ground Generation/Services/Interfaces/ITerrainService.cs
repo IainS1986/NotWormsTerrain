@@ -12,4 +12,5 @@ public interface ITerrainService
     void SmoothContours();
     void RemoveVertices();
     void Decomp();
+    void Mesh();
 }

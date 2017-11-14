@@ -67,6 +67,7 @@ public class Main : MonoBehaviour
         AddButton(i++, "SMOOTH", () => m_terrainService.SmoothContours(), b, w, h);
         AddButton(i++, "REMOVE", () => m_terrainService.RemoveVertices(), b, w, h);
         AddButton(i++, "DECOMP", () => m_terrainService.Decomp(), b, w, h);
+        AddButton(i++, "MESH", () => m_terrainService.Mesh(), b, w, h);
         AddButton(i++, "ALL", () =>
         {
             m_terrainService.Generate();
@@ -74,6 +75,7 @@ public class Main : MonoBehaviour
             m_terrainService.SmoothContours();
             m_terrainService.RemoveVertices();
             m_terrainService.Decomp();
+            m_terrainService.Mesh();
         }, b, w, h);
     }
 
@@ -93,7 +95,8 @@ public class Main : MonoBehaviour
     private void RenderDots()
     {
         if (m_terrainService.Ground == null ||
-            m_terrainService.Ground.Dots == null)
+            m_terrainService.Ground.Dots == null ||
+            m_terrainService.Ground.CurrentStage >= GroundStage.MESH)
             return;
 
         // render dots
@@ -139,7 +142,8 @@ public class Main : MonoBehaviour
         GL.Begin(GL.LINES);
 
         if (m_terrainService.Ground != null &&
-            m_terrainService.Ground.Chunks!= null)
+            m_terrainService.Ground.Chunks!= null &&
+            m_terrainService.Ground.CurrentStage < GroundStage.MESH)
         {
             foreach(var chunk in m_terrainService.Ground.Chunks)
             {
@@ -207,7 +211,8 @@ public class Main : MonoBehaviour
         GL.Begin(GL.LINES);
 
         if (m_terrainService.Ground != null &&
-            m_terrainService.Ground.Chunks != null)
+            m_terrainService.Ground.Chunks != null &&
+            m_terrainService.Ground.CurrentStage < GroundStage.MESH)
         {
             foreach (var chunk in m_terrainService.Ground.Chunks)
             {

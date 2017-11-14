@@ -16,6 +16,7 @@ public class ContourSmoothingService : IContourSmoothingService
     {
         foreach (var chunk in chunks)
         {
+            chunk.Value.Dispose();
             chunk.Value.Poly = null;
             //Smooth Contours
             for (int i = 0; i < m_numSmoothingPasses; i++)
@@ -58,6 +59,7 @@ public class ContourSmoothingService : IContourSmoothingService
     {
         foreach (var chunk in chunks)
         {
+            chunk.Value.Dispose();
             chunk.Value.Poly = null;
             //Smooth Contours
             RemoveVertices(chunk.Value.Edge);

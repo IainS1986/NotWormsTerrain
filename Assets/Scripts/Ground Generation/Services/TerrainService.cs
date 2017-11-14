@@ -8,6 +8,7 @@ public class TerrainService : ITerrainService
     private readonly IMarchingService m_marchingSquaresService;
     private readonly IContourSmoothingService m_contourSmoothingService;
     private readonly IDecompService m_decompService;
+    private readonly IMeshService m_meshService;
 
     public Ground Ground
     {
@@ -21,6 +22,7 @@ public class TerrainService : ITerrainService
         m_contourSmoothingService = new ContourSmoothingService();
         m_marchingSquaresService = new MarchingService();
         m_decompService = new DecompService();
+        m_meshService = new MeshService();
     }
 
     public void SetDimensions(int width, int height)
@@ -68,6 +70,8 @@ public class TerrainService : ITerrainService
         //Clear ChunkID lookups
         foreach (var id in chunkIdsToRemove)
         {
+            var chunk = Ground.Chunks[id.Key];
+            chunk.Dispose();
             Ground.Chunks.Remove(id.Key);
         }
         //Clear GroundToChunk values (Quicker way to do this?)
@@ -94,6 +98,10 @@ public class TerrainService : ITerrainService
         if (Ground.CurrentStage >= GroundStage.DECOMP)
         {
             m_decompService.Decomp(chunks);
+        }
+        if (Ground.CurrentStage >= GroundStage.MESH)
+        {
+            m_meshService.BuildMesh(chunks);
         }
 
         return change;
@@ -144,5 +152,15 @@ public class TerrainService : ITerrainService
         m_decompService.Decomp(Ground);
 
         Ground.CurrentStage = GroundStage.DECOMP;
+    }
+
+    public void Mesh()
+    {
+        if (Ground == null || Ground.CurrentStage < GroundStage.DECOMP)
+            return;
+
+        m_meshService.BuildMesh(Ground);
+
+        Ground.CurrentStage = GroundStage.MESH;
     }
 }
