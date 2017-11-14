@@ -21,7 +21,7 @@ public class Main : MonoBehaviour
 
     private Material m_lineMaterial;
 
-    public ITerrainService Ground
+    public ITerrainService TerrainService
     {
         get { return m_terrainService; }
     }
