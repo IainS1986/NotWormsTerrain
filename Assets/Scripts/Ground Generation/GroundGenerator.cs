@@ -11,75 +11,36 @@ using Poly2Tri.Triangulation.Delaunay;
 
 public class GroundGenerator 
 {
-    public enum GroundStage
-    {
-        NONE = 0,
-        DOTS,
-        MARCHING,
-        SMOOTHED,
-        VERTEX_REMOVAL,
-        DECOMP,
-        MESH,
-        LIPS,
-    };
-
     IGroundGeneratorService m_groundGeneratorService;
     IMarchingService m_marchingSquaresService;
     IContourSmoothingService m_contourSmoothingService;
     IDecompService m_decompService;
 
-    public int[,] Ground { get; private set; }
-    public int[,] GroundToChunk { get; private set; }
-    public Dictionary<int, GroundChunk> IDToChunk { get; private set; }
-    public int Height { get; private set; }
-    public int Width { get; private set; }
-    public List<GroundChunk> Chunks { get; private set; }
-    public GroundStage CurrentStage { get; set; }
+    public Ground Ground
+    {
+        get;
+        private set;
+    }
     
 	public GroundGenerator(int _width, int _height)
     {
-		Height = _height;
-		Width = _width;
-        Ground = new int[Height, Width];
-        GroundToChunk = new int[Height, Width];
-        IDToChunk = new Dictionary<int, GroundChunk>();
-        CurrentStage = GroundStage.NONE;
-        Chunks = new List<GroundChunk>();
-
-        //TODO TinyIOC
         m_groundGeneratorService = new GroundGeneratorService();
         m_contourSmoothingService = new ContourSmoothingService();
         m_marchingSquaresService = new MarchingService();
         m_decompService = new DecompService();
+
+        Ground = new Ground(_width, _height);
     }
 
-    //Helper Function for external API
-    public bool GroundWillChange(int x, int y, int s, int type)
+    public bool GroundChangeSelectiveRebuild(int x, int y, int s, int type)
     {
-        for (int i = x; i <= x + s; i++)
-        {
-            for (int j = y; j <= y + s; j++)
-            {
-                int xx = i;
-                int yy = j;
-                if (xx < 0 || xx >= Width) continue;
-                if (yy < 0 || yy >= Height) continue;
-                if (Ground[yy,xx] == type) continue;
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void GroundChangeSelectiveRebuild(int x, int y, int s, int type)
-    {
-        bool change = m_groundGeneratorService.SafeGroundFillForGenerator(x, y, s, type,Width,Height, ref Ground);
+        bool change = m_groundGeneratorService.SafeGroundFillForGenerator(x, y, s, type, Ground);
 
         if (!change)
-            return;
+            return change;
 
-        if (CurrentStage == GroundStage.NONE) return;
-        if (CurrentStage == GroundStage.DOTS) return;
+        if (Ground.CurrentStage == GroundStage.NONE) return change;
+        if (Ground.CurrentStage == GroundStage.DOTS) return change;
 
         int border = 2;//Extra range to check for nearby ground that *may* be effected
         int minx = int.MaxValue;
@@ -95,14 +56,14 @@ public class GroundGenerator
                 int yy = y - border + j;
 
                 //Ensure we don't go out of bounds
-                if (xx >= 0 && xx < Width && yy >= 0 && yy < Height)
+                if (xx >= 0 && xx < Ground.Width && yy >= 0 && yy < Ground.Height)
                 {
                     if (xx < minx) minx = xx;
                     if (yy < miny) miny = yy;
 
-                    if (GroundToChunk[yy, xx] != 0 && !chunkIdsToRemove.ContainsKey(GroundToChunk[yy, xx]))
+                    if (Ground.DotToChunk[yy, xx] != 0 && !chunkIdsToRemove.ContainsKey(Ground.DotToChunk[yy, xx]))
                     {
-                        chunkIdsToRemove.Add(GroundToChunk[yy, xx], true);
+                        chunkIdsToRemove.Add(Ground.DotToChunk[yy, xx], true);
                     }
                 }
             }
@@ -111,85 +72,84 @@ public class GroundGenerator
         //Clear ChunkID lookups
         foreach(var id in chunkIdsToRemove)
         {
-            GroundChunk chunk = IDToChunk[id.Key];
+            GroundChunk chunk = Ground.IDToChunk[id.Key];
             //Destroy chunk
-            Chunks.Remove(chunk);
-            IDToChunk.Remove(id.Key);
+            Ground.Chunks.Remove(chunk);
+            Ground.IDToChunk.Remove(id.Key);
         }
         //Clear GroundToChunk values (Quicker way to do this?)
-        for (int a = 0; a < Width; a++)
-            for (int b = 0; b < Height; b++)
-                if (chunkIdsToRemove.ContainsKey(GroundToChunk[b, a]))
-                    GroundToChunk[b, a] = 0;
+        for (int a = 0; a < Ground.Width; a++)
+            for (int b = 0; b < Ground.Height; b++)
+                if (chunkIdsToRemove.ContainsKey(Ground.DotToChunk[b, a]))
+                    Ground.DotToChunk[b, a] = 0;
 
         //Preprocess
-        m_groundGeneratorService.DotRemoval(minx, miny, s + (border * 2), s + (border * 2), Width, Height, ref Ground);
-        m_groundGeneratorService.RemoveDiagonals(minx, miny, s + (border * 2), s + (border * 2), ref Ground);
+        m_groundGeneratorService.DotRemoval(minx, miny, s + (border * 2), s + (border * 2), Ground);
+        m_groundGeneratorService.RemoveDiagonals(minx, miny, s + (border * 2), s + (border * 2), Ground);
 
-        List<GroundChunk> chunks = m_marchingSquaresService.March(0,0,Width, Height, Ground, ref GroundToChunk, ref IDToChunk);
+        List<GroundChunk> chunks = m_marchingSquaresService.March(0, 0, Ground.Width, Ground.Height, Ground);
 
-        if (CurrentStage >= GroundStage.SMOOTHED)
+        if (Ground.CurrentStage >= GroundStage.SMOOTHED)
         {
-            m_contourSmoothingService.SmoothContours(ref Chunks);  
+            m_contourSmoothingService.SmoothContours(chunks);  
         }
-        if (CurrentStage >= GroundStage.VERTEX_REMOVAL)
+        if (Ground.CurrentStage >= GroundStage.VERTEX_REMOVAL)
         {
-            m_contourSmoothingService.RemoveVertices(ref Chunks);
+            m_contourSmoothingService.RemoveVertices(chunks);
         }
-        if (CurrentStage >= GroundStage.DECOMP)
+        if (Ground.CurrentStage >= GroundStage.DECOMP)
         {
-            m_decompService.Decomp(ref Chunks);
+            m_decompService.Decomp(chunks);
         }
 
-        Chunks.AddRange(chunks);
+        Ground.Chunks.AddRange(chunks);
+
+        return change;
     }
 
     public void Generate()
     {
-        Ground = m_groundGeneratorService.Generate(Width, Height);
-        Chunks = new List<GroundChunk>();
-        GroundToChunk = new int[Height, Width];
-        IDToChunk = new Dictionary<int, GroundChunk>();
-
-        CurrentStage = GroundStage.DOTS;
+        m_groundGeneratorService.Generate(Ground);
+    
+        Ground.CurrentStage = GroundStage.DOTS;
     }
 
     public void March()
     {
-        GroundToChunk = new int[Height, Width];
-        IDToChunk = new Dictionary<int, GroundChunk>();
-        Chunks = m_marchingSquaresService.March(0, 0, Width, Height, Ground, ref GroundToChunk, ref IDToChunk);
+        Ground.DotToChunk = new int[Ground.Height, Ground.Width];
+        Ground.IDToChunk = new Dictionary<int, GroundChunk>();
+        Ground.Chunks = m_marchingSquaresService.March(0, 0, Ground.Width, Ground.Height, Ground);
 
-        CurrentStage = GroundStage.MARCHING;
+        Ground.CurrentStage = GroundStage.MARCHING;
     }
 
     public void SmoothContours()
     {
-        if (Chunks == null)
+        if (Ground == null)
             return;
 
-        m_contourSmoothingService.SmoothContours(ref Chunks);
+        m_contourSmoothingService.SmoothContours(Ground);
 
-        CurrentStage = GroundStage.SMOOTHED;
+       Ground.CurrentStage = GroundStage.SMOOTHED;
     }
 
     public void RemoveVertices()
     {
-        if (Chunks == null)
+        if (Ground == null)
             return;
 
-        m_contourSmoothingService.RemoveVertices(ref Chunks);
+        m_contourSmoothingService.RemoveVertices(Ground);
 
-        CurrentStage = GroundStage.VERTEX_REMOVAL;
+        Ground.CurrentStage = GroundStage.VERTEX_REMOVAL;
     }
 
     public void Decomp()
     {
-        if (Chunks == null)
+        if (Ground == null)
             return;
 
-        m_decompService.Decomp(ref Chunks);
+        m_decompService.Decomp(Ground);
 
-        CurrentStage = GroundStage.DECOMP;
+        Ground.CurrentStage = GroundStage.DECOMP;
     }
 }

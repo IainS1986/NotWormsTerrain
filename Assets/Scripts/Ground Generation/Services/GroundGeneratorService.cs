@@ -11,9 +11,12 @@ public class GroundGeneratorService : IGroundGeneratorService
 
     private int m_totalMaterials = 2;//TODO Expose
 
-    public int[,] Generate(int width, int height)
+    public void Generate(Ground ground)
     {
-        var ground = new int[height, width];
+        ground.Chunks = new List<GroundChunk>();
+        ground.IDToChunk = new Dictionary<int, GroundChunk>();
+        ground.DotToChunk = new int[ground.Height, ground.Width];
+        ground.Dots = new int[ground.Height, ground.Width];
         var seed = (int)System.DateTime.Now.Ticks;
 
         System.Random r = new System.Random(seed);
@@ -31,63 +34,65 @@ public class GroundGeneratorService : IGroundGeneratorService
             for (int c = 0; c < m_chunk.Length; c++)
             {
                 //Starting point
-                int x = (c + 1) * (width / (chunk + 1));
-                int y = r.Next(height / 3) + i * (height / 2);
+                int x = (c + 1) * (ground.Width / (chunk + 1));
+                int y = r.Next(ground.Height / 3) + i * (ground.Height / 2);
                 for (int p = 0; p < pass; p++)
                 {
                     x += r.Next(-move, move);
                     y += r.Next(-move / 2, move / (i + 1));
 
-                    SafeGroundFillForGenerator(x, y, size, i + 1, width, height, ref ground);
+                    SafeGroundFillForGenerator(x, y, size, i + 1, ground);
                 }
             }
         }
 
-        DotRemoval(0, 0, width, height, width, height, ref ground);
-        RemoveDiagonals(0, 0, width, height, ref ground);
-
-        return ground;
+        DotRemoval(0, 0, ground.Width, ground.Height, ground);
+        RemoveDiagonals(0, 0, ground.Width, ground.Height, ground);
     }
 
-    public void DotRemoval(int xx, int yy, int ww, int hh, int tw, int th, ref int[,] ground)
+    public void DotRemoval(int xx, int yy, int ww, int hh, Ground ground)
     {
         for (int x = xx; x < xx + ww; x++)
         {
             for (int y = yy; y < yy + hh; y++)
             {
-                if (x > 0 && ground[y, x] == ground[y, x - 1]) continue;//Left
-                if (x < tw - 1 && ground[y, x] == ground[y, x + 1]) continue;//Right
-                if (y > 0 && ground[y, x] == ground[y - 1, x]) continue;//Up
-                if (y < th - 1 && ground[y, x] == ground[y + 1, x]) continue;//Down
-                if (x > 0 && y > 0 && ground[y, x] == ground[y - 1, x - 1]) continue;//TopLeft
-                if (x < tw - 1 && y > 0 && ground[y, x] == ground[y - 1, x + 1]) continue;//TopRight
-                if (x > 0 && y < th - 1 && ground[y, x] == ground[y + 1, x - 1]) continue;//BotLeft
-                if (x < tw - 1 && y < th - 1 && ground[y, x] == ground[y + 1, x + 1]) continue;//BotRight
+                if (x > 0 && ground.Dots[y, x] == ground.Dots[y, x - 1]) continue;//Left
+                if (x < ground.Width - 1 && ground.Dots[y, x] == ground.Dots[y, x + 1]) continue;//Right
+                if (y > 0 && ground.Dots[y, x] == ground.Dots[y - 1, x]) continue;//Up
+                if (y < ground.Height - 1 && ground.Dots[y, x] == ground.Dots[y + 1, x]) continue;//Down
+                if (x > 0 && y > 0 && ground.Dots[y, x] == ground.Dots[y - 1, x - 1]) continue;//TopLeft
+                if (x < ground.Width - 1 && y > 0 && ground.Dots[y, x] == ground.Dots[y - 1, x + 1]) continue;//TopRight
+                if (x > 0 && y < ground.Height - 1 && ground.Dots[y, x] == ground.Dots[y + 1, x - 1]) continue;//BotLeft
+                if (x < ground.Width - 1 && y < ground.Height - 1 && ground.Dots[y, x] == ground.Dots[y + 1, x + 1]) continue;//BotRight
                 //Remove
-                ground[y, x] = ground[y, x - 1];
+                ground.Dots[y, x] = ground.Dots[y, x - 1];
             }
         }
     }
 
-    public void RemoveDiagonals(int xx, int yy, int ww, int hh, ref int[,] ground)
+    public void RemoveDiagonals(int xx, int yy, int ww, int hh, Ground ground)
     {
         for (int x = xx; x < xx + ww; x++)
         {
             for (int y = yy; y < yy + hh; y++)
             {
-                if (ground[y, x] == ground[y + 1, x + 1] &&
-                    ground[y, x] != ground[y, x + 1] &&
-                    ground[y, x] != ground[y + 1, x])
+                if (x >= ground.Width - 1 ||
+                    y >= ground.Height - 1)
+                    continue;
+
+                if (ground.Dots[y, x] == ground.Dots[y + 1, x + 1] &&
+                    ground.Dots[y, x] != ground.Dots[y, x + 1] &&
+                    ground.Dots[y, x] != ground.Dots[y + 1, x])
                 {
                     //Remove diagonals
-                    ground[y, x] = ground[y, x + 1];
-                    ground[y + 1, x + 1] = ground[y + 1, x];
+                    ground.Dots[y, x] = ground.Dots[y, x + 1];
+                    ground.Dots[y + 1, x + 1] = ground.Dots[y + 1, x];
                 }
             }
         }
     }
 
-    public bool SafeGroundFillForGenerator(int x, int y, int r, int type, int tw, int th, ref int[,] ground)
+    public bool SafeGroundFillForGenerator(int x, int y, int r, int type, Ground ground)
     {
         bool change = false;
         int rpow = r * r;
@@ -99,19 +104,19 @@ public class GroundGeneratorService : IGroundGeneratorService
                 int xx = x + i;
                 int yy = y + j;
 
-                if (xx < 1 || xx >= tw - 1)
+                if (xx < 1 || xx >= ground.Width - 1)
                     continue;
 
-                if (yy < 1 || yy >= th - 1)
+                if (yy < 1 || yy >= ground.Height - 1)
                     continue;
 
                 if ((xx - x) * (xx - x) + (yy - y) * (yy - y) > rpow)
                     continue;
 
-                if (ground[yy, xx] == type)
+                if (ground.Dots[yy, xx] == type)
                     continue;
 
-                ground[yy, xx] = type;
+                ground.Dots[yy, xx] = type;
                 change = true;
             }
         }

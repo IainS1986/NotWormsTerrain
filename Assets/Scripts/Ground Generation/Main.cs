@@ -85,12 +85,16 @@ public class Main : MonoBehaviour
             if (action != null)
                 action();
             DateTime after = DateTime.Now;
-            //Debug.Log(string.Format("{0} took {1}ms", s, (after - before).TotalMilliseconds));
+            Debug.Log(string.Format("{0} took {1}ms", s, (after - before).TotalMilliseconds));
         }
     }
 
     private void RenderDots()
     {
+        if (m_groundGenerator.Ground == null ||
+            m_groundGenerator.Ground.Dots == null)
+            return;
+
         // render dots
         GL.Begin(GL.QUADS);
 
@@ -106,7 +110,7 @@ public class Main : MonoBehaviour
         {
             for(int x=0; x < m_width; x++)
             {
-                int val  = m_groundGenerator.Ground[y,x];
+                int val  = m_groundGenerator.Ground.Dots[y,x];
 
                 if(val <= 0)
                     continue;
@@ -133,9 +137,10 @@ public class Main : MonoBehaviour
     {
         GL.Begin(GL.LINES);
 
-        if (m_groundGenerator.Chunks != null)
+        if (m_groundGenerator.Ground != null &&
+            m_groundGenerator.Ground.Chunks!= null)
         {
-            foreach(GroundChunk chunk in m_groundGenerator.Chunks)
+            foreach(GroundChunk chunk in m_groundGenerator.Ground.Chunks)
             {
                 //Set Colour
                 Color col = EARTH_COL;
@@ -200,9 +205,10 @@ public class Main : MonoBehaviour
     {
         GL.Begin(GL.LINES);
 
-        if (m_groundGenerator.Chunks != null)
+        if (m_groundGenerator.Ground != null &&
+            m_groundGenerator.Ground.Chunks != null)
         {
-            foreach (GroundChunk chunk in m_groundGenerator.Chunks)
+            foreach (GroundChunk chunk in m_groundGenerator.Ground.Chunks)
             {
                 if (chunk.Poly == null || chunk.Poly.Tris == null)
                     continue;

@@ -4,5 +4,7 @@ using UnityEngine;
 
 public interface IDecompService
 {
-    void Decomp(ref List<GroundChunk> chunks);
+    void Decomp(Ground ground);
+
+    void Decomp(List<GroundChunk> chunks);
 }

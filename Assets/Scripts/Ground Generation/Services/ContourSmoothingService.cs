@@ -7,17 +7,22 @@ public class ContourSmoothingService : IContourSmoothingService
     public int[] m_smoothWeights = new int[] { 1, 2, 1 };
     public int m_numSmoothingPasses = 5;
 
-    public void SmoothContours(ref List<GroundChunk> chunks)
+    public void SmoothContours(Ground ground)
+    {
+        SmoothContours(ground.Chunks);
+    }
+
+    public void SmoothContours(List<GroundChunk> chunks)
     {
         foreach (var chunk in chunks)
         {
             chunk.Poly = null;
             //Smooth Contours
-            for(int i=0; i<m_numSmoothingPasses; i++)
+            for (int i = 0; i < m_numSmoothingPasses; i++)
                 SmoothContour(chunk.Edge);
 
             foreach (var hole in chunk.Holes)
-                for(int i=0; i<m_numSmoothingPasses; i++)
+                for (int i = 0; i < m_numSmoothingPasses; i++)
                     SmoothContour(hole);
         }
     }
@@ -44,7 +49,12 @@ public class ContourSmoothingService : IContourSmoothingService
         vs.CopyFrom(smooth);
     }
 
-    public void RemoveVertices(ref List<GroundChunk> chunks)
+    public void RemoveVertices(Ground ground)
+    {
+        RemoveVertices(ground.Chunks);
+    }
+
+    public void RemoveVertices(List<GroundChunk> chunks)
     {
         foreach (var chunk in chunks)
         {

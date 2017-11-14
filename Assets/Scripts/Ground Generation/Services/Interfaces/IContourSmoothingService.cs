@@ -4,6 +4,9 @@ using UnityEngine;
 
 public interface IContourSmoothingService
 {
-    void SmoothContours(ref List<GroundChunk> chunks);
-    void RemoveVertices(ref List<GroundChunk> chunks);
+    void SmoothContours(Ground ground);
+    void RemoveVertices(Ground ground);
+
+    void SmoothContours(List<GroundChunk> chunks);
+    void RemoveVertices(List<GroundChunk> chunks);
 }

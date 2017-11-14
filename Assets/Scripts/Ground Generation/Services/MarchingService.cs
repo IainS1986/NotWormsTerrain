@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class MarchingService : IMarchingService
 {
-    public List<GroundChunk> March(int xx, int yy, int ww, int hh, int[,] ground, ref int[,] groundToChunk, ref Dictionary<int, GroundChunk> idToChunk)
+    public List<GroundChunk> March(int xx, int yy, int ww, int hh, Ground ground)
     {
         List<GroundChunk> chunks = new List<GroundChunk>();
 
@@ -13,22 +13,22 @@ public class MarchingService : IMarchingService
         {
             for (int x = xx; x < xx + ww; x++)
             {
-                int g = ground[y, x];
-                int c = groundToChunk[y, x];
+                int g = ground.Dots[y, x];
+                int c = ground.DotToChunk[y, x];
 
                 if (g == 0 || c != 0)
                     continue;
 
                 //Get Left, Below and Left/Below Diag values to see if they are the same
                 //This is used to check holes and know which chunk to assign holes too
-                int lg = ground[y, x - 1];
-                int bg = ground[y - 1, x];
-                int lbg = ground[y - 1, x - 1];
+                int lg = ground.Dots[y, x - 1];
+                int bg = ground.Dots[y - 1, x];
+                int lbg = ground.Dots[y - 1, x - 1];
 
                 bool neighbourSame = lg == g || bg == g || lbg == g;
 
                 //Is this an edge
-                int marchVal = MarchingValue(x, y, g, ground);
+                int marchVal = MarchingValue(x, y, g, ground.Dots);
                 if (marchVal != 0 && marchVal != 15)
                 {
                     //New edge....get the contour and either make a new Ground Chunk or assign it as a Hole to an existing one
@@ -38,28 +38,28 @@ public class MarchingService : IMarchingService
                     if (neighbourSame)
                     {
                         if (lg == g)
-                            cID = groundToChunk[y, x - 1];
+                            cID = ground.DotToChunk[y, x - 1];
                         else if (bg == g)
-                            cID = groundToChunk[y - 1, x];
+                            cID = ground.DotToChunk[y - 1, x];
                         else if (lbg == g)
-                            cID = groundToChunk[y - 1, x - 1];
+                            cID = ground.DotToChunk[y - 1, x - 1];
                         else
                             UnityEngine.Debug.LogWarning("NO NEIGHBOUR FOUND");
 
-                        owner = idToChunk[cID];
+                        owner = ground.IDToChunk[cID];
                     }
                     else
                     {
                         cID = GroundChunk.NextID;
                         owner = new GroundChunk();
                         owner.GroundType = g;
-                        idToChunk.Add(cID, owner);
+                        ground.IDToChunk.Add(cID, owner);
 
                         chunks.Add(owner);
                     }
 
                     //Get Contour
-                    VertexSequence contour = FindContour(x, y, g, cID, owner, ground, ref groundToChunk);
+                    VertexSequence contour = FindContour(x, y, g, cID, owner, ground);
 
                     if (neighbourSame)
                         owner.Holes.Add(contour);
@@ -71,11 +71,11 @@ public class MarchingService : IMarchingService
                 {
                     //Mark this non edge as being "owned" by the neighbouring chunk (i.e. its inside a chunk)
                     if (lg == g)
-                        groundToChunk[y, x] = groundToChunk[y, x - 1];
+                        ground.DotToChunk[y, x] = ground.DotToChunk[y, x - 1];
                     else if (bg == g)
-                        groundToChunk[y, x] = groundToChunk[y - 1, x];
+                        ground.DotToChunk[y, x] = ground.DotToChunk[y - 1, x];
                     else if (lbg == g)
-                        groundToChunk[y, x] = groundToChunk[y - 1, x - 1];
+                        ground.DotToChunk[y, x] = ground.DotToChunk[y - 1, x - 1];
                 }
             }
         }
@@ -83,7 +83,7 @@ public class MarchingService : IMarchingService
         return chunks;
     }
 
-    private VertexSequence FindContour(int x, int y, int g, int chunkID, GroundChunk owner, int[,] ground, ref int[,] groundToChunk)
+    private VertexSequence FindContour(int x, int y, int g, int chunkID, GroundChunk owner, Ground ground)
     {
         //Contour
         VertexSequence contour = new VertexSequence();
@@ -96,7 +96,7 @@ public class MarchingService : IMarchingService
         bool addPoint = true;
 
         //Predict an error with Marching Squares here
-        bits = MarchingValue(curx, cury, g, ground);
+        bits = MarchingValue(curx, cury, g, ground.Dots);
         if (bits == 6 || bits == 9) UnityEngine.Debug.LogWarning("MARCHING MIGHT CRASH");
         if (bits == 15) UnityEngine.Debug.LogWarning("MARCHING IS STARTING IN ERROR!!!");
 
@@ -105,7 +105,7 @@ public class MarchingService : IMarchingService
             nextx = curx;
             nexty = cury;
 
-            bits = MarchingValue(curx, cury, g, ground);
+            bits = MarchingValue(curx, cury, g, ground.Dots);
             addPoint = true;
             switch (bits)
             {
@@ -136,8 +136,8 @@ public class MarchingService : IMarchingService
                     starty = cury;
                 }
 
-                if (ground[cury, curx] == g)
-                    groundToChunk[cury, curx] = chunkID;
+                if (ground.Dots[cury, curx] == g)
+                    ground.DotToChunk[cury, curx] = chunkID;
 
                 contour.Add(new Point() { X = curx - 0.5f, Y = cury - 0.5f });
                 prevx = curx;

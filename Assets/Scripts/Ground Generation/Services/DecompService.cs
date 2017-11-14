@@ -14,7 +14,12 @@ public class Decomp
 
 public class DecompService : IDecompService
 {
-    public void Decomp(ref List<GroundChunk> chunks)
+    public void Decomp(Ground ground)
+    {
+        Decomp(ground.Chunks);
+    }
+
+    public void Decomp(List<GroundChunk> chunks)
     {
         foreach (var chunk in chunks)
         {

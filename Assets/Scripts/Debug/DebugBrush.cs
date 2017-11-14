@@ -37,13 +37,11 @@ public class DebugBrush : MonoBehaviour {
             Vector2 p = MousePositionInWorld();
             int xx = UnityEngine.Mathf.FloorToInt(p.x);
             int yy = UnityEngine.Mathf.FloorToInt(p.y);
-            if (m_main.Ground.GroundWillChange(xx,yy, m_size, (int)m_brush))
-            {
-                DateTime now = DateTime.Now;
-                m_main.Ground.GroundChangeSelectiveRebuild(xx, yy, m_size, (int)m_brush);
-                TimeSpan tspan = DateTime.Now.Subtract(now);
+            DateTime now = DateTime.Now;
+            bool change = m_main.Ground.GroundChangeSelectiveRebuild(xx, yy, m_size, (int)m_brush);
+            TimeSpan tspan = DateTime.Now.Subtract(now);
+            if(change)
                 Debug.Log(string.Format("ReBuild took {0} ms", tspan.TotalMilliseconds));
-            }
         }
     }
 
