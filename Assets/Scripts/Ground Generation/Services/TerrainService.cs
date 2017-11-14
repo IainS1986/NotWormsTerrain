@@ -57,9 +57,9 @@ public class TerrainService : ITerrainService
                     if (xx < minx) minx = xx;
                     if (yy < miny) miny = yy;
 
-                    if (Ground.DotToChunk[yy, xx] != 0 && !chunkIdsToRemove.ContainsKey(Ground.DotToChunk[yy, xx]))
+                    if (Ground.Dots[yy, xx].Chunk != 0 && !chunkIdsToRemove.ContainsKey(Ground.Dots[yy, xx].Chunk))
                     {
-                        chunkIdsToRemove.Add(Ground.DotToChunk[yy, xx], true);
+                        chunkIdsToRemove.Add(Ground.Dots[yy, xx].Chunk, true);
                     }
                 }
             }
@@ -76,8 +76,8 @@ public class TerrainService : ITerrainService
         //Clear GroundToChunk values (Quicker way to do this?)
         for (int a = 0; a < Ground.Width; a++)
             for (int b = 0; b < Ground.Height; b++)
-                if (chunkIdsToRemove.ContainsKey(Ground.DotToChunk[b, a]))
-                    Ground.DotToChunk[b, a] = 0;
+                if (chunkIdsToRemove.ContainsKey(Ground.Dots[b, a].Chunk))
+                    Ground.Dots[b, a].Chunk = 0;
 
         //Preprocess
         m_groundGeneratorService.DotRemoval(minx, miny, s + (border * 2), s + (border * 2), Ground);
@@ -112,8 +112,7 @@ public class TerrainService : ITerrainService
 
     public void March()
     {
-        Ground.DotToChunk = new int[Ground.Height, Ground.Width];
-        Ground.IDToChunk = new Dictionary<int, GroundChunk>();
+        Ground.ResetChunks();
         Ground.Chunks = m_marchingSquaresService.March(0, 0, Ground.Width, Ground.Height, Ground);
 
         Ground.CurrentStage = GroundStage.MARCHING;

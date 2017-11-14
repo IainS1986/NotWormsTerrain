@@ -15,8 +15,7 @@ public class GroundGeneratorService : IGroundGeneratorService
     {
         ground.Chunks = new List<GroundChunk>();
         ground.IDToChunk = new Dictionary<int, GroundChunk>();
-        ground.DotToChunk = new int[ground.Height, ground.Width];
-        ground.Dots = new int[ground.Height, ground.Width];
+        ground.Dots = new Dot[ground.Height, ground.Width];
         var seed = (int)System.DateTime.Now.Ticks;
 
         System.Random r = new System.Random(seed);
@@ -56,14 +55,14 @@ public class GroundGeneratorService : IGroundGeneratorService
         {
             for (int y = yy; y < yy + hh; y++)
             {
-                if (x > 0 && ground.Dots[y, x] == ground.Dots[y, x - 1]) continue;//Left
-                if (x < ground.Width - 1 && ground.Dots[y, x] == ground.Dots[y, x + 1]) continue;//Right
-                if (y > 0 && ground.Dots[y, x] == ground.Dots[y - 1, x]) continue;//Up
-                if (y < ground.Height - 1 && ground.Dots[y, x] == ground.Dots[y + 1, x]) continue;//Down
-                if (x > 0 && y > 0 && ground.Dots[y, x] == ground.Dots[y - 1, x - 1]) continue;//TopLeft
-                if (x < ground.Width - 1 && y > 0 && ground.Dots[y, x] == ground.Dots[y - 1, x + 1]) continue;//TopRight
-                if (x > 0 && y < ground.Height - 1 && ground.Dots[y, x] == ground.Dots[y + 1, x - 1]) continue;//BotLeft
-                if (x < ground.Width - 1 && y < ground.Height - 1 && ground.Dots[y, x] == ground.Dots[y + 1, x + 1]) continue;//BotRight
+                if (x > 0 && ground.Dots[y, x].Value == ground.Dots[y, x - 1].Value) continue;//Left
+                if (x < ground.Width - 1 && ground.Dots[y, x].Value == ground.Dots[y, x + 1].Value) continue;//Right
+                if (y > 0 && ground.Dots[y, x].Value == ground.Dots[y - 1, x].Value) continue;//Up
+                if (y < ground.Height - 1 && ground.Dots[y, x].Value == ground.Dots[y + 1, x].Value) continue;//Down
+                if (x > 0 && y > 0 && ground.Dots[y, x].Value == ground.Dots[y - 1, x - 1].Value) continue;//TopLeft
+                if (x < ground.Width - 1 && y > 0 && ground.Dots[y, x].Value == ground.Dots[y - 1, x + 1].Value) continue;//TopRight
+                if (x > 0 && y < ground.Height - 1 && ground.Dots[y, x].Value == ground.Dots[y + 1, x - 1].Value) continue;//BotLeft
+                if (x < ground.Width - 1 && y < ground.Height - 1 && ground.Dots[y, x].Value == ground.Dots[y + 1, x + 1].Value) continue;//BotRight
                 //Remove
                 ground.Dots[y, x] = ground.Dots[y, x - 1];
             }
@@ -80,13 +79,13 @@ public class GroundGeneratorService : IGroundGeneratorService
                     y >= ground.Height - 1)
                     continue;
 
-                if (ground.Dots[y, x] == ground.Dots[y + 1, x + 1] &&
-                    ground.Dots[y, x] != ground.Dots[y, x + 1] &&
-                    ground.Dots[y, x] != ground.Dots[y + 1, x])
+                if (ground.Dots[y, x].Value == ground.Dots[y + 1, x + 1].Value &&
+                    ground.Dots[y, x].Value != ground.Dots[y, x + 1].Value &&
+                    ground.Dots[y, x].Value != ground.Dots[y + 1, x].Value)
                 {
                     //Remove diagonals
-                    ground.Dots[y, x] = ground.Dots[y, x + 1];
-                    ground.Dots[y + 1, x + 1] = ground.Dots[y + 1, x];
+                    ground.Dots[y, x].Value= ground.Dots[y, x + 1].Value;
+                    ground.Dots[y + 1, x + 1].Value = ground.Dots[y + 1, x].Value;
                 }
             }
         }
@@ -113,10 +112,10 @@ public class GroundGeneratorService : IGroundGeneratorService
                 if ((xx - x) * (xx - x) + (yy - y) * (yy - y) > rpow)
                     continue;
 
-                if (ground.Dots[yy, xx] == type)
+                if (ground.Dots[yy, xx].Value == type)
                     continue;
 
-                ground.Dots[yy, xx] = type;
+                ground.Dots[yy, xx].Value = type;
                 change = true;
             }
         }

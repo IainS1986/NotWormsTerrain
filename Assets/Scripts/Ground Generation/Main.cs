@@ -100,7 +100,7 @@ public class Main : MonoBehaviour
         GL.Begin(GL.QUADS);
 
         float s = 0.1f;
-
+        
         GL.Color(Color.gray);
         GL.Vertex3(-1, -1, 0);  
         GL.Vertex3(-1, m_height + 1, 0);  
@@ -111,7 +111,7 @@ public class Main : MonoBehaviour
         {
             for(int x=0; x < m_width; x++)
             {
-                int val  = m_terrainService.Ground.Dots[y,x];
+                int val  = m_terrainService.Ground.Dots[y,x].Value;
 
                 if(val <= 0)
                     continue;

@@ -13,17 +13,17 @@ public class MarchingService : IMarchingService
         {
             for (int x = xx; x < xx + ww; x++)
             {
-                int g = ground.Dots[y, x];
-                int c = ground.DotToChunk[y, x];
+                int g = ground.Dots[y, x].Value;
+                int c = ground.Dots[y, x].Chunk;
 
                 if (g == 0 || c != 0)
                     continue;
 
                 //Get Left, Below and Left/Below Diag values to see if they are the same
                 //This is used to check holes and know which chunk to assign holes too
-                int lg = ground.Dots[y, x - 1];
-                int bg = ground.Dots[y - 1, x];
-                int lbg = ground.Dots[y - 1, x - 1];
+                int lg = ground.Dots[y, x - 1].Value;
+                int bg = ground.Dots[y - 1, x].Value;
+                int lbg = ground.Dots[y - 1, x - 1].Value;
 
                 bool neighbourSame = lg == g || bg == g || lbg == g;
 
@@ -38,11 +38,11 @@ public class MarchingService : IMarchingService
                     if (neighbourSame)
                     {
                         if (lg == g)
-                            cID = ground.DotToChunk[y, x - 1];
+                            cID = ground.Dots[y, x - 1].Chunk;
                         else if (bg == g)
-                            cID = ground.DotToChunk[y - 1, x];
+                            cID = ground.Dots[y - 1, x].Chunk;
                         else if (lbg == g)
-                            cID = ground.DotToChunk[y - 1, x - 1];
+                            cID = ground.Dots[y - 1, x - 1].Chunk;
                         else
                             UnityEngine.Debug.LogWarning("NO NEIGHBOUR FOUND");
 
@@ -71,11 +71,11 @@ public class MarchingService : IMarchingService
                 {
                     //Mark this non edge as being "owned" by the neighbouring chunk (i.e. its inside a chunk)
                     if (lg == g)
-                        ground.DotToChunk[y, x] = ground.DotToChunk[y, x - 1];
+                        ground.Dots[y, x].Chunk = ground.Dots[y, x - 1].Chunk;
                     else if (bg == g)
-                        ground.DotToChunk[y, x] = ground.DotToChunk[y - 1, x];
+                        ground.Dots[y, x].Chunk = ground.Dots[y - 1, x].Chunk;
                     else if (lbg == g)
-                        ground.DotToChunk[y, x] = ground.DotToChunk[y - 1, x - 1];
+                        ground.Dots[y, x].Chunk = ground.Dots[y - 1, x - 1].Chunk;
                 }
             }
         }
@@ -136,8 +136,8 @@ public class MarchingService : IMarchingService
                     starty = cury;
                 }
 
-                if (ground.Dots[cury, curx] == g)
-                    ground.DotToChunk[cury, curx] = chunkID;
+                if (ground.Dots[cury, curx].Value == g)
+                    ground.Dots[cury, curx].Chunk = chunkID;
 
                 contour.Add(new Point() { X = curx - 0.5f, Y = cury - 0.5f });
                 prevx = curx;
@@ -152,20 +152,20 @@ public class MarchingService : IMarchingService
         return contour;
     }
 
-    private int MarchingValue(int x, int y, int i, int[,] ground)
+    private int MarchingValue(int x, int y, int i, Dot[,] ground)
     {
         int sum = 0;
 
-        if (ground[y - 1, x - 1] == i)
+        if (ground[y - 1, x - 1].Value == i)
             sum |= 1;
 
-        if (ground[y - 1, x] == i)
+        if (ground[y - 1, x].Value == i)
             sum |= 2;
 
-        if (ground[y, x - 1] == i)
+        if (ground[y, x - 1].Value == i)
             sum |= 4;
 
-        if (ground[y, x] == i)
+        if (ground[y, x].Value == i)
             sum |= 8;
 
         return sum;
