@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IMarchingService
 {
-    List<GroundChunk> March(int xx, int yy, int ww, int hh, Ground ground);
+    void March(int xx, int yy, int ww, int hh, Ground ground, out Dictionary<int, GroundChunk> chunks);
 }

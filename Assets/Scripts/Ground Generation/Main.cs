@@ -141,28 +141,28 @@ public class Main : MonoBehaviour
         if (m_terrainService.Ground != null &&
             m_terrainService.Ground.Chunks!= null)
         {
-            foreach(GroundChunk chunk in m_terrainService.Ground.Chunks)
+            foreach(var chunk in m_terrainService.Ground.Chunks)
             {
                 //Set Colour
                 Color col = EARTH_COL;
-                if (chunk.GroundType == 1)
+                if (chunk.Value.GroundType == 1)
                     col = EARTH_COL;
                 else
                     col = STONE_COL;
 
                 GL.Color(col);
-                for(int i=0; i<chunk.Edge.Count; i++)
+                for(int i=0; i<chunk.Value.Edge.Count; i++)
                 {
-                    GL.Vertex3(chunk.Edge[i].X, chunk.Edge[i].Y, 0);
-                    GL.Vertex3(chunk.Edge[i + 1].X, chunk.Edge[i + 1].Y, 0);
+                    GL.Vertex3(chunk.Value.Edge[i].X, chunk.Value.Edge[i].Y, 0);
+                    GL.Vertex3(chunk.Value.Edge[i + 1].X, chunk.Value.Edge[i + 1].Y, 0);
 
                     //Render point
                     GL.End();
                     GL.Begin(GL.QUADS);
                     GL.Color(Color.black);
                     float s = 0.05f;
-                    float xx = chunk.Edge[i].X;
-                    float yy = chunk.Edge[i].Y;
+                    float xx = chunk.Value.Edge[i].X;
+                    float yy = chunk.Value.Edge[i].Y;
                     GL.Vertex3(xx - s, yy - s, 0);
                     GL.Vertex3(xx + s, yy - s, 0);
                     GL.Vertex3(xx + s, yy + s, 0);
@@ -172,7 +172,7 @@ public class Main : MonoBehaviour
                     GL.Color(col);
                 }
 
-                foreach(VertexSequence hole in chunk.Holes)
+                foreach(VertexSequence hole in chunk.Value.Holes)
                 {
                     for(int i=0; i<hole.Count; i++)
                     {
@@ -209,16 +209,16 @@ public class Main : MonoBehaviour
         if (m_terrainService.Ground != null &&
             m_terrainService.Ground.Chunks != null)
         {
-            foreach (GroundChunk chunk in m_terrainService.Ground.Chunks)
+            foreach (var chunk in m_terrainService.Ground.Chunks)
             {
-                if (chunk.Poly == null || chunk.Poly.Tris == null)
+                if (chunk.Value.Poly == null || chunk.Value.Poly.Tris == null)
                     continue;
 
-                var poly = chunk.Poly;
+                var poly = chunk.Value.Poly;
 
                 //Set Colour
                 Color col = EARTH_COL;
-                if (chunk.GroundType == 1)
+                if (chunk.Value.GroundType == 1)
                     col = EARTH_COL;
                 else
                     col = STONE_COL;

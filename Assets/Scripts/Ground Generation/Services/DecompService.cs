@@ -19,11 +19,11 @@ public class DecompService : IDecompService
         Decomp(ground.Chunks);
     }
 
-    public void Decomp(List<GroundChunk> chunks)
+    public void Decomp(Dictionary<int, GroundChunk> chunks)
     {
         foreach (var chunk in chunks)
         {
-            Decomp(chunk);
+            Decomp(chunk.Value);
         }
     }
 

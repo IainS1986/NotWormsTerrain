@@ -68,10 +68,7 @@ public class TerrainService : ITerrainService
         //Clear ChunkID lookups
         foreach (var id in chunkIdsToRemove)
         {
-            GroundChunk chunk = Ground.IDToChunk[id.Key];
-            //Destroy chunk
-            Ground.Chunks.Remove(chunk);
-            Ground.IDToChunk.Remove(id.Key);
+            Ground.Chunks.Remove(id.Key);
         }
         //Clear GroundToChunk values (Quicker way to do this?)
         for (int a = 0; a < Ground.Width; a++)
@@ -83,7 +80,8 @@ public class TerrainService : ITerrainService
         m_groundGeneratorService.DotRemoval(minx, miny, s + (border * 2), s + (border * 2), Ground);
         m_groundGeneratorService.RemoveDiagonals(minx, miny, s + (border * 2), s + (border * 2), Ground);
 
-        List<GroundChunk> chunks = m_marchingSquaresService.March(0, 0, Ground.Width, Ground.Height, Ground);
+        Dictionary<int, GroundChunk> chunks = new Dictionary<int, GroundChunk>();
+        m_marchingSquaresService.March(0, 0, Ground.Width, Ground.Height, Ground, out chunks);
 
         if (Ground.CurrentStage >= GroundStage.SMOOTHED)
         {
@@ -98,8 +96,6 @@ public class TerrainService : ITerrainService
             m_decompService.Decomp(chunks);
         }
 
-        Ground.Chunks.AddRange(chunks);
-
         return change;
     }
 
@@ -112,8 +108,10 @@ public class TerrainService : ITerrainService
 
     public void March()
     {
+        var newChunks = new Dictionary<int, GroundChunk>();
+
         Ground.ResetChunks();
-        Ground.Chunks = m_marchingSquaresService.March(0, 0, Ground.Width, Ground.Height, Ground);
+        m_marchingSquaresService.March(0, 0, Ground.Width, Ground.Height, Ground, out newChunks);
 
         Ground.CurrentStage = GroundStage.MARCHING;
     }

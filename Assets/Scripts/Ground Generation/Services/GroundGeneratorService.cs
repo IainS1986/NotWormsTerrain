@@ -13,8 +13,7 @@ public class GroundGeneratorService : IGroundGeneratorService
 
     public void Generate(Ground ground)
     {
-        ground.Chunks = new List<GroundChunk>();
-        ground.IDToChunk = new Dictionary<int, GroundChunk>();
+        ground.Chunks = new Dictionary<int, GroundChunk>();
         ground.Dots = new Dot[ground.Height, ground.Width];
         var seed = (int)System.DateTime.Now.Ticks;
 

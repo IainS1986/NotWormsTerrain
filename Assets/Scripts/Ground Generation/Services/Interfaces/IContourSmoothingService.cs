@@ -7,6 +7,6 @@ public interface IContourSmoothingService
     void SmoothContours(Ground ground);
     void RemoveVertices(Ground ground);
 
-    void SmoothContours(List<GroundChunk> chunks);
-    void RemoveVertices(List<GroundChunk> chunks);
+    void SmoothContours(Dictionary<int, GroundChunk> chunks);
+    void RemoveVertices(Dictionary<int, GroundChunk> chunks);
 }

@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class MarchingService : IMarchingService
 {
-    public List<GroundChunk> March(int xx, int yy, int ww, int hh, Ground ground)
+    public void March(int xx, int yy, int ww, int hh, Ground ground, out Dictionary<int, GroundChunk> chunks)
     {
-        List<GroundChunk> chunks = new List<GroundChunk>();
+        chunks = new Dictionary<int, GroundChunk>();
 
         for (int y = yy; y < yy + hh; y++)
         {
@@ -46,16 +46,16 @@ public class MarchingService : IMarchingService
                         else
                             UnityEngine.Debug.LogWarning("NO NEIGHBOUR FOUND");
 
-                        owner = ground.IDToChunk[cID];
+                        owner = ground.Chunks[cID];
                     }
                     else
                     {
                         cID = GroundChunk.NextID;
                         owner = new GroundChunk();
                         owner.GroundType = g;
-                        ground.IDToChunk.Add(cID, owner);
+                        ground.Chunks.Add(cID, owner);
 
-                        chunks.Add(owner);
+                        chunks.Add(cID, owner);
                     }
 
                     //Get Contour
@@ -79,8 +79,6 @@ public class MarchingService : IMarchingService
                 }
             }
         }
-
-        return chunks;
     }
 
     private VertexSequence FindContour(int x, int y, int g, int chunkID, GroundChunk owner, Ground ground)

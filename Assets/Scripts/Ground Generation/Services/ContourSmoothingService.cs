@@ -12,16 +12,16 @@ public class ContourSmoothingService : IContourSmoothingService
         SmoothContours(ground.Chunks);
     }
 
-    public void SmoothContours(List<GroundChunk> chunks)
+    public void SmoothContours(Dictionary<int, GroundChunk> chunks)
     {
         foreach (var chunk in chunks)
         {
-            chunk.Poly = null;
+            chunk.Value.Poly = null;
             //Smooth Contours
             for (int i = 0; i < m_numSmoothingPasses; i++)
-                SmoothContour(chunk.Edge);
+                SmoothContour(chunk.Value.Edge);
 
-            foreach (var hole in chunk.Holes)
+            foreach (var hole in chunk.Value.Holes)
                 for (int i = 0; i < m_numSmoothingPasses; i++)
                     SmoothContour(hole);
         }
@@ -54,14 +54,14 @@ public class ContourSmoothingService : IContourSmoothingService
         RemoveVertices(ground.Chunks);
     }
 
-    public void RemoveVertices(List<GroundChunk> chunks)
+    public void RemoveVertices(Dictionary<int, GroundChunk> chunks)
     {
         foreach (var chunk in chunks)
         {
-            chunk.Poly = null;
+            chunk.Value.Poly = null;
             //Smooth Contours
-            RemoveVertices(chunk.Edge);
-            foreach (var hole in chunk.Holes)
+            RemoveVertices(chunk.Value.Edge);
+            foreach (var hole in chunk.Value.Holes)
                 RemoveVertices(hole);
         }
     }
