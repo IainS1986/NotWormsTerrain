@@ -1,35 +1,31 @@
 ﻿using System.Collections;
-using System;
 using System.Collections.Generic;
-using Poly2Tri.Triangulation.Polygon;
-using Poly2Tri.Triangulation.Delaunay.Sweep;
-using Poly2Tri.Triangulation;
-using System.Linq;
 using UnityEngine;
-using Common;
-using Poly2Tri.Triangulation.Delaunay;
 
-public class GroundGenerator 
+public class TerrainService : ITerrainService
 {
-    IGroundGeneratorService m_groundGeneratorService;
-    IMarchingService m_marchingSquaresService;
-    IContourSmoothingService m_contourSmoothingService;
-    IDecompService m_decompService;
+    private readonly IGroundGeneratorService m_groundGeneratorService;
+    private readonly IMarchingService m_marchingSquaresService;
+    private readonly IContourSmoothingService m_contourSmoothingService;
+    private readonly IDecompService m_decompService;
 
     public Ground Ground
     {
         get;
         private set;
     }
-    
-	public GroundGenerator(int _width, int _height)
+
+    public TerrainService()
     {
         m_groundGeneratorService = new GroundGeneratorService();
         m_contourSmoothingService = new ContourSmoothingService();
         m_marchingSquaresService = new MarchingService();
         m_decompService = new DecompService();
+    }
 
-        Ground = new Ground(_width, _height);
+    public void SetDimensions(int width, int height)
+    {
+        Ground = new Ground(width, height);
     }
 
     public bool GroundChangeSelectiveRebuild(int x, int y, int s, int type)
@@ -70,7 +66,7 @@ public class GroundGenerator
         }
 
         //Clear ChunkID lookups
-        foreach(var id in chunkIdsToRemove)
+        foreach (var id in chunkIdsToRemove)
         {
             GroundChunk chunk = Ground.IDToChunk[id.Key];
             //Destroy chunk
@@ -91,7 +87,7 @@ public class GroundGenerator
 
         if (Ground.CurrentStage >= GroundStage.SMOOTHED)
         {
-            m_contourSmoothingService.SmoothContours(chunks);  
+            m_contourSmoothingService.SmoothContours(chunks);
         }
         if (Ground.CurrentStage >= GroundStage.VERTEX_REMOVAL)
         {
@@ -110,7 +106,7 @@ public class GroundGenerator
     public void Generate()
     {
         m_groundGeneratorService.Generate(Ground);
-    
+
         Ground.CurrentStage = GroundStage.DOTS;
     }
 
@@ -130,7 +126,7 @@ public class GroundGenerator
 
         m_contourSmoothingService.SmoothContours(Ground);
 
-       Ground.CurrentStage = GroundStage.SMOOTHED;
+        Ground.CurrentStage = GroundStage.SMOOTHED;
     }
 
     public void RemoveVertices()

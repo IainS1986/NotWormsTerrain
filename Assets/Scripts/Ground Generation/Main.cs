@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class Main : MonoBehaviour
 {
+    private ITerrainService m_terrainService;
+
     [SerializeField]
     private int m_width = 512;
 
@@ -17,14 +19,12 @@ public class Main : MonoBehaviour
     [SerializeField]
     public Color STONE_COL = new UnityEngine.Color(0,1,0,1f);
 
-    private GroundGenerator m_groundGenerator;
-    public GroundGenerator Ground
-    {
-        get { return m_groundGenerator; }
-        set { m_groundGenerator = value; }
-    }
-
     private Material m_lineMaterial;
+
+    public ITerrainService Ground
+    {
+        get { return m_terrainService; }
+    }
 
     public void Start()
     {
@@ -32,7 +32,8 @@ public class Main : MonoBehaviour
         m_lineMaterial.hideFlags = HideFlags.HideAndDontSave;
         m_lineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
 
-        m_groundGenerator = new GroundGenerator(m_width, m_height);
+        m_terrainService = new TerrainService();
+        m_terrainService.SetDimensions(m_width, m_height);
     }
 
     // OpenGL Rendering
@@ -61,18 +62,18 @@ public class Main : MonoBehaviour
         GUI.Box(boundary, "GROUND GEN");
 
         int i = 0;
-        AddButton(i++, "DOTS", () => m_groundGenerator.Generate(), b, w, h);
-        AddButton(i++, "MARCH", () => m_groundGenerator.March(), b, w, h);
-        AddButton(i++, "SMOOTH", () => m_groundGenerator.SmoothContours(), b, w, h);
-        AddButton(i++, "REMOVE", () => m_groundGenerator.RemoveVertices(), b, w, h);
-        AddButton(i++, "DECOMP", () => m_groundGenerator.Decomp(), b, w, h);
+        AddButton(i++, "DOTS", () => m_terrainService.Generate(), b, w, h);
+        AddButton(i++, "MARCH", () => m_terrainService.March(), b, w, h);
+        AddButton(i++, "SMOOTH", () => m_terrainService.SmoothContours(), b, w, h);
+        AddButton(i++, "REMOVE", () => m_terrainService.RemoveVertices(), b, w, h);
+        AddButton(i++, "DECOMP", () => m_terrainService.Decomp(), b, w, h);
         AddButton(i++, "ALL", () =>
         {
-            m_groundGenerator.Generate();
-            m_groundGenerator.March();
-            m_groundGenerator.SmoothContours();
-            m_groundGenerator.RemoveVertices();
-            m_groundGenerator.Decomp();
+            m_terrainService.Generate();
+            m_terrainService.March();
+            m_terrainService.SmoothContours();
+            m_terrainService.RemoveVertices();
+            m_terrainService.Decomp();
         }, b, w, h);
     }
 
@@ -91,8 +92,8 @@ public class Main : MonoBehaviour
 
     private void RenderDots()
     {
-        if (m_groundGenerator.Ground == null ||
-            m_groundGenerator.Ground.Dots == null)
+        if (m_terrainService.Ground == null ||
+            m_terrainService.Ground.Dots == null)
             return;
 
         // render dots
@@ -110,7 +111,7 @@ public class Main : MonoBehaviour
         {
             for(int x=0; x < m_width; x++)
             {
-                int val  = m_groundGenerator.Ground.Dots[y,x];
+                int val  = m_terrainService.Ground.Dots[y,x];
 
                 if(val <= 0)
                     continue;
@@ -137,10 +138,10 @@ public class Main : MonoBehaviour
     {
         GL.Begin(GL.LINES);
 
-        if (m_groundGenerator.Ground != null &&
-            m_groundGenerator.Ground.Chunks!= null)
+        if (m_terrainService.Ground != null &&
+            m_terrainService.Ground.Chunks!= null)
         {
-            foreach(GroundChunk chunk in m_groundGenerator.Ground.Chunks)
+            foreach(GroundChunk chunk in m_terrainService.Ground.Chunks)
             {
                 //Set Colour
                 Color col = EARTH_COL;
@@ -205,10 +206,10 @@ public class Main : MonoBehaviour
     {
         GL.Begin(GL.LINES);
 
-        if (m_groundGenerator.Ground != null &&
-            m_groundGenerator.Ground.Chunks != null)
+        if (m_terrainService.Ground != null &&
+            m_terrainService.Ground.Chunks != null)
         {
-            foreach (GroundChunk chunk in m_groundGenerator.Ground.Chunks)
+            foreach (GroundChunk chunk in m_terrainService.Ground.Chunks)
             {
                 if (chunk.Poly == null || chunk.Poly.Tris == null)
                     continue;
