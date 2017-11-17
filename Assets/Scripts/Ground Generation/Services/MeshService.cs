@@ -4,13 +4,10 @@ using UnityEngine;
 
 public class MeshService : IMeshService
 {
-    private static Mesh sStraightMesh;
-    private static int[] sStraightVertexPairings;
-    private static int[] sStraightLeftHandVerts;
-    private static int[] sStraightRightHandVerts;
-
     private static Material[] Materials = new Material[2];
     private static Material[] Materials_Lips = new Material[2];
+
+    private static float sLipDepth = 10;
 
     public MeshService()
     {
@@ -27,46 +24,6 @@ public class MeshService : IMeshService
             (Material)Resources.Load("Materials/Earth_Lip"),
             (Material)Resources.Load("Materials/Stone_Lip")
         };
-
-        //Build the straight mesh we use as a template for lips, placing each template at each vertexsequence segment
-        BuildStraightMesh();
-    }
-
-    private static void BuildStraightMesh()
-    {
-        Mesh straight = new Mesh();
-
-        Vector3[] verts = new Vector3[6];
-        int[] tris = new int[4 * 3];
-        Vector2[] uvs = new Vector2[6];
-        Vector3[] norms = new Vector3[6];
-
-        verts[0] = new Vector3(-0.5f, -0.5f, 0f);
-        verts[1] = new Vector3(-0.5f, 0, 0f);
-        verts[2] = new Vector3(-0.5f, 0, 2.5f);
-
-        verts[3] = new Vector3(0.5f, -0.5f, 0f);
-        verts[4] = new Vector3(0.5f, 0, 0f);
-        verts[5] = new Vector3(0.5f, 0, 2.5f);
-
-        int t = 0;
-        tris[t++] = 0; tris[t++] = 1; tris[t++] = 4;
-        tris[t++] = 4; tris[t++] = 3; tris[t++] = 0;
-        tris[t++] = 1; tris[t++] = 2; tris[t++] = 5;
-        tris[t++] = 5; tris[t++] = 4; tris[t++] = 1;
-
-        sStraightVertexPairings = new int[] { 3, 4, 5, 0, 1, 2 };
-        sStraightLeftHandVerts = new int[] { 0, 1, 2 };
-        sStraightRightHandVerts = new int[] { 3, 4, 5 };
-
-        straight.vertices = verts;
-        straight.uv = uvs;
-        straight.triangles = tris;
-        straight.normals = norms;
-
-        straight.RecalculateNormals();
-
-        sStraightMesh = straight;
     }
 
     #region Main Mesh
@@ -139,6 +96,9 @@ public class MeshService : IMeshService
 
     public void BuildLips(Dictionary<int, GroundChunk> chunks)
     {
+        foreach (var chunk in chunks)
+            chunk.Value.DisposeLips();
+
         foreach(var chunk in chunks)
         {
             BuildLips(chunk.Value);
@@ -147,31 +107,77 @@ public class MeshService : IMeshService
 
     private void BuildLips(GroundChunk chunk)
     {
-        BuildLipForContour(chunk.Edge, Materials_Lips[chunk.GroundType]);
+        BuildLipForContour(chunk, chunk.Edge, Materials_Lips[chunk.GroundType]);
 
         if(chunk.Holes!= null)
         {
             foreach(var hole in chunk.Holes)
             {
-                BuildLipForContour(hole, Materials_Lips[chunk.GroundType]);
+                BuildLipForContour(chunk, hole, Materials_Lips[chunk.GroundType]);
             }
         }
     }
 
-    private void BuildLipForContour(VertexSequence contour, Material material)
+    private void BuildLipForContour(GroundChunk chunk, VertexSequence contour, Material material)
     {
         Mesh lip = new Mesh();
+        lip.name = "GroundChunkLipMesh";
+
+        GameObject lipObjt = new GameObject("GroundChunkLip");
+        MeshFilter mf = lipObjt.AddComponent<MeshFilter>();
+        MeshRenderer mr = lipObjt.AddComponent<MeshRenderer>();
+        mf.mesh = lip;
+        mr.material = Materials_Lips[chunk.GroundType];
 
         //Each point the contour has 3 verts connected to the next point on the contour. The verts are in an L-Shape
         //It sits over the edge of the main contour mesh
-        int totalVerts = contour.Count * 3;
+        int totalVerts = contour.Count * 2;
 
         Vector3[] verts = new Vector3[totalVerts];
         Vector3[] norms = new Vector3[totalVerts];
         Vector2[] uvs = new Vector2[totalVerts];
 
         //The L-Shape has 4 tris per segment. 2 forming the rectangle on the face, 2 forming the rectangle on the "floor/roof/depth"
-        int[] tris = new int[contour.Count * 4];
+        //Everything is multiplied by 3 as its 3 verts per tri...(the verts are index)
+        int[] tris = new int[totalVerts* 3];
+
+        int t = 0;
+        int v = 0;
+        for(int i=0; i<contour.Count; i++)
+        {
+            Point p = contour[i - 1];
+            Point q = contour[i];
+            Point r = contour[i + 1];
+
+            //TODO Rotation, use p and r to work out the "normal" direciton of q so we rotate the lip correctly...
+
+            //Add top surface
+            verts[v++] = new Vector3(q.X, q.Y, 0);
+            verts[v++] = new Vector3(q.X, q.Y, sLipDepth);
+
+            //Add 2 tris to the next indices
+            //Note - Last segment wraps round to the first indices...
+            if (i == contour.Count - 1)
+            {
+                tris[t++] = v - 2; tris[t++] = v - 1; tris[t++] = 0;
+                tris[t++] = v - 1; tris[t++] = 1; tris[t++] = 0;
+            }
+            else
+            {
+                tris[t++] = v-2; tris[t++] = v-1; tris[t++] = v;
+                tris[t++] = v-1; tris[t++] = v+1; tris[t++] = v;
+            }
+        }
+
+        lip.vertices = verts;
+        lip.normals = norms;
+        lip.triangles = tris;
+        lip.uv = uvs;
+
+        lip.RecalculateNormals();
+
+        chunk.Lips.Add(lipObjt);
+        chunk.LipMeshes.Add(lip);
     }
     #endregion
 }

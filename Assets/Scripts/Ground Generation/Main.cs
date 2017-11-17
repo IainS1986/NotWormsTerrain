@@ -57,7 +57,7 @@ public class Main : MonoBehaviour
         int w = 150;
         int h = 20;
         
-        int num_buttons = 7;
+        int num_buttons = 8;
         Rect boundary = new Rect(b/2, Screen.height - h - b - (b/2) - h, num_buttons * (b+w), h + b + h);
         GUI.Box(boundary, "GROUND GEN");
 
@@ -68,6 +68,7 @@ public class Main : MonoBehaviour
         AddButton(i++, "REMOVE", () => m_terrainService.RemoveVertices(), b, w, h);
         AddButton(i++, "DECOMP", () => m_terrainService.Decomp(), b, w, h);
         AddButton(i++, "MESH", () => m_terrainService.Mesh(), b, w, h);
+        AddButton(i++, "LIP", () => m_terrainService.Lips(), b, w, h);
         AddButton(i++, "ALL", () =>
         {
             m_terrainService.Generate();
@@ -76,6 +77,7 @@ public class Main : MonoBehaviour
             m_terrainService.RemoveVertices();
             m_terrainService.Decomp();
             m_terrainService.Mesh();
+            m_terrainService.Lips();
         }, b, w, h);
     }
 

@@ -13,4 +13,5 @@ public interface ITerrainService
     void RemoveVertices();
     void Decomp();
     void Mesh();
+    void Lips();
 }

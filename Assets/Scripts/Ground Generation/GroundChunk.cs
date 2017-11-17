@@ -21,14 +21,26 @@ public class GroundChunk
 
     public GameObject GameObject { get; set; }
 
+    public List<GameObject> Lips { get; set; }
+
+    public List<Mesh> LipMeshes { get; set; }
+
     public int GroundType { get; set; }
 
     public GroundChunk()
     {
         Holes = new List<VertexSequence>();
+        Lips = new List<GameObject>();
+        LipMeshes = new List<Mesh>();
 	}
 
     public void Dispose()
+    {
+        DisposeMesh();
+        DisposeLips();
+    }
+
+    public void DisposeMesh()
     {
         if(Mesh!= null)
         {
@@ -38,6 +50,27 @@ public class GroundChunk
         if(GameObject!= null)
         {
             MonoBehaviour.Destroy(GameObject);
+        }
+    }
+
+    public void DisposeLips()
+    {
+        if(Lips!= null)
+        {
+            foreach(var lip in Lips)
+            {
+                MonoBehaviour.Destroy(lip);
+            }
+            Lips.Clear();
+        }
+
+        if(LipMeshes!= null)
+        {
+            foreach(var lip in LipMeshes)
+            {
+                MonoBehaviour.Destroy(lip);
+            }
+            LipMeshes.Clear();
         }
     }
 }

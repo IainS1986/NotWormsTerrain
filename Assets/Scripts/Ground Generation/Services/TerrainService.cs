@@ -103,6 +103,10 @@ public class TerrainService : ITerrainService
         {
             m_meshService.BuildMesh(chunks);
         }
+        if (Ground.CurrentStage >= GroundStage.LIPS)
+        {
+            m_meshService.BuildLips(chunks);
+        }
 
         return change;
     }
@@ -162,5 +166,15 @@ public class TerrainService : ITerrainService
         m_meshService.BuildMesh(Ground);
 
         Ground.CurrentStage = GroundStage.MESH;
+    }
+
+    public void Lips()
+    {
+        if (Ground == null || Ground.CurrentStage < GroundStage.MESH)
+            return;
+
+        m_meshService.BuildLips(Ground);
+
+        Ground.CurrentStage = GroundStage.LIPS;
     }
 }
