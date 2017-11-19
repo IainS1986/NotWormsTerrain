@@ -63,7 +63,6 @@ public class Main : MonoBehaviour
         RenderDots();
         RenderEdges();
         RenderDecomp();
-        RenderVertices();
         if (DebugEnabled)
             RenderVertices();
     }
@@ -71,7 +70,7 @@ public class Main : MonoBehaviour
     private void OnDebugToggle()
     {
         //Get All Meshrenderers
-        var mrs = (MeshRenderer[]) FindSceneObjectsOfType(typeof(MeshRenderer));
+        var mrs = FindObjectsOfType<MeshRenderer>();
         foreach (var mr in mrs)
             mr.enabled = !DebugEnabled;
     }
@@ -298,29 +297,47 @@ public class Main : MonoBehaviour
                 if (chunk.Value == null || chunk.Value.LipMeshes == null)
                     return;
 
-                //Set Colour
-                Color col = EARTH_COL;
-                if (chunk.Value.GroundType == 1)
-                    col = EARTH_COL;
-                else
-                    col = STONE_COL;
-
+                Color[] cols = new Color[] { Color.red, Color.red, Color.blue };
                 foreach(var lip in chunk.Value.LipMeshes)
                 {
                     var verts = lip.vertices;
 
-                    foreach(var v in verts)
+                    for(int i=0; i<verts.Length; i++)
                     {
+                        Vector3 v = verts[i];
+
+                        var mod = i % 3;
+                        GL.Color(cols[mod]);
+
                         //Render point
-                        GL.Color(col);
                         float s = 0.05f;
                         float xx = v.x;
                         float yy = v.y;
-                        GL.Vertex3(xx - s, yy - s, 0);
-                        GL.Vertex3(xx + s, yy - s, 0);
-                        GL.Vertex3(xx + s, yy + s, 0);
-                        GL.Vertex3(xx - s, yy + s, 0);
+                        float zz = v.z;
+                        GL.Vertex3(xx - s, yy - s, zz);
+                        GL.Vertex3(xx + s, yy - s, zz);
+                        GL.Vertex3(xx + s, yy + s, zz);
+                        GL.Vertex3(xx - s, yy + s, zz);
                     }
+
+                    //Render "lip edges"
+                    GL.End();
+                    GL.Begin(GL.LINES);
+                    GL.Color(Color.white);
+                    for(int i=0; i<verts.Length; i+=3)
+                    {
+                        var v1 = verts[i];
+                        var v2 = verts[i + 1];
+                        var v3 = verts[i + 2];
+
+                        //Render Edge V1-V2 and V3-V1
+                        GL.Vertex3(v1.x, v1.y, v1.z);
+                        GL.Vertex3(v2.x, v2.y, v2.z);
+                        GL.Vertex3(v1.x, v1.y, v1.z);
+                        GL.Vertex3(v3.x, v3.y, v3.z);
+                    }
+                    GL.End();
+                    GL.Begin(GL.QUADS);
 
                 }
             }

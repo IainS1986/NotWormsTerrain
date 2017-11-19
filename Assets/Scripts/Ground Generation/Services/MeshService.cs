@@ -146,6 +146,7 @@ public class MeshService : IMeshService
 
         int t = 0;
         int v = 0;
+        Point previousNorm = new Point();
         for(int i=0; i<contour.Count; i++)
         {
             Point p = contour[i - 1];
@@ -160,9 +161,19 @@ public class MeshService : IMeshService
             norm *= sLipSize;
 
             //Convex/Concave flip
-            float cross = Point.Cross(qp, qr);
+            var cross = Point.Cross(qp, qr);
             if (cross < 0)
                 norm = -norm;
+            
+            //If we have a perfectly straight line, then the normal (or bisect) will be 0,0
+            //So as a simple fix for this, we just copy the lip vector from the previous lip
+            if (Mathf.Approximately(qp.X, -qr.X) &&
+                Mathf.Approximately(qp.Y, -qr.Y))
+            {
+                norm = previousNorm;
+            }
+
+            previousNorm = norm;
 
             //Add top surface
             verts[v++] = new Vector3(q.X, q.Y, sLipOverhang);
