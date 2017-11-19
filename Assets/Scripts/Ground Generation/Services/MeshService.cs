@@ -7,7 +7,7 @@ public class MeshService : IMeshService
     private static Material[] Materials = new Material[2];
     private static Material[] Materials_Lips = new Material[2];
 
-    private static float sLipDepth = 10;
+    private static float sLipDepth = 5;
 
     public MeshService()
     {
