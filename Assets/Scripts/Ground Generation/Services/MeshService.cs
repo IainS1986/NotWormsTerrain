@@ -153,10 +153,16 @@ public class MeshService : IMeshService
             Point r = contour[i + 1];
 
             //TODO Rotation, use p and r to work out the "normal" direciton of q so we rotate the lip correctly...
-            Point qp = p - q;
-            Point qr = r - q;
+            Point qp = Point.Normalize(p - q);
+            Point qr = Point.Normalize(r - q);
+
             Point norm = Point.Bisect(qp, qr);
             norm *= sLipSize;
+
+            //Convex/Concave flip
+            float cross = Point.Cross(qp, qr);
+            if (cross < 0)
+                norm = -norm;
 
             //Add top surface
             verts[v++] = new Vector3(q.X, q.Y, sLipOverhang);

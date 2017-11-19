@@ -19,11 +19,21 @@ public class Main : MonoBehaviour
     [SerializeField]
     public Color STONE_COL = new UnityEngine.Color(0,1,0,1f);
 
+    [SerializeField]
+    private bool m_renderExtraDebug = false;
+
     private Material m_lineMaterial;
 
     public ITerrainService TerrainService
     {
         get { return m_terrainService; }
+    }
+
+    private bool m_debugEnabled = false;
+    public bool DebugEnabled
+    {
+        get { return m_debugEnabled; }
+        set { m_debugEnabled = value; OnDebugToggle(); }
     }
 
     public void Start()
@@ -36,6 +46,14 @@ public class Main : MonoBehaviour
         m_terrainService.SetDimensions(m_width, m_height);
     }
 
+    public void Update()
+    {
+        if (m_renderExtraDebug && !DebugEnabled)
+            DebugEnabled = true;
+        else if (!m_renderExtraDebug && DebugEnabled)
+            DebugEnabled = false;
+    }
+
     // OpenGL Rendering
     public void OnPostRender()
     {
@@ -45,6 +63,17 @@ public class Main : MonoBehaviour
         RenderDots();
         RenderEdges();
         RenderDecomp();
+        RenderVertices();
+        if (DebugEnabled)
+            RenderVertices();
+    }
+
+    private void OnDebugToggle()
+    {
+        //Get All Meshrenderers
+        var mrs = (MeshRenderer[]) FindSceneObjectsOfType(typeof(MeshRenderer));
+        foreach (var mr in mrs)
+            mr.enabled = !DebugEnabled;
     }
 
     void OnGUI()
@@ -253,5 +282,49 @@ public class Main : MonoBehaviour
         }
 
         GL.End();
+    }
+
+    private void RenderVertices()
+    {
+        GL.Begin(GL.LINES);
+
+        if (m_terrainService.Ground != null &&
+            m_terrainService.Ground.Chunks != null &&
+            m_terrainService.Ground.CurrentStage >= GroundStage.MESH)
+        {
+            GL.Begin(GL.QUADS);
+            foreach (var chunk in m_terrainService.Ground.Chunks)
+            {
+                if (chunk.Value == null || chunk.Value.LipMeshes == null)
+                    return;
+
+                //Set Colour
+                Color col = EARTH_COL;
+                if (chunk.Value.GroundType == 1)
+                    col = EARTH_COL;
+                else
+                    col = STONE_COL;
+
+                foreach(var lip in chunk.Value.LipMeshes)
+                {
+                    var verts = lip.vertices;
+
+                    foreach(var v in verts)
+                    {
+                        //Render point
+                        GL.Color(col);
+                        float s = 0.05f;
+                        float xx = v.x;
+                        float yy = v.y;
+                        GL.Vertex3(xx - s, yy - s, 0);
+                        GL.Vertex3(xx + s, yy - s, 0);
+                        GL.Vertex3(xx + s, yy + s, 0);
+                        GL.Vertex3(xx - s, yy + s, 0);
+                    }
+
+                }
+            }
+            GL.End();
+        }
     }
 }

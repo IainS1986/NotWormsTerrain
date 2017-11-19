@@ -16,6 +16,11 @@ public struct Point
         return new Point() { X = a.X - b.X, Y = a.Y - b.Y };
     }
 
+    public static Point operator -(Point a)
+    {
+        return new Point() { X = -a.X, Y = -a.Y };
+    }
+
     public static Point operator *(Point a, float s)
     {
         return new Point() { X = a.X * s, Y = a.Y * s };
@@ -31,6 +36,11 @@ public struct Point
     {
         float size = Mathf.Sqrt((a.X * a.X) + (a.Y * a.Y));
         return new Point() { X = a.X / size, Y = a.Y / size };
+    }
+
+    public static float Cross(Point a, Point b)
+    {
+        return a.X * b.Y - a.Y * b.X;
     }
 }
 
