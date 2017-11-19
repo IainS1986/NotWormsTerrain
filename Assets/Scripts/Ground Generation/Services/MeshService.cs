@@ -8,6 +8,8 @@ public class MeshService : IMeshService
     private static Material[] Materials_Lips = new Material[2];
 
     private static float sLipDepth = 5;
+    private static float sLipOverhang = -0.1f;
+    private static float sLipSize = 2;
 
     public MeshService()
     {
@@ -131,7 +133,8 @@ public class MeshService : IMeshService
 
         //Each point the contour has 3 verts connected to the next point on the contour. The verts are in an L-Shape
         //It sits over the edge of the main contour mesh
-        int totalVerts = contour.Count * 2;
+        int totalVerts = contour.Count * 3;
+        int totalTris = contour.Count * 4;
 
         Vector3[] verts = new Vector3[totalVerts];
         Vector3[] norms = new Vector3[totalVerts];
@@ -139,7 +142,7 @@ public class MeshService : IMeshService
 
         //The L-Shape has 4 tris per segment. 2 forming the rectangle on the face, 2 forming the rectangle on the "floor/roof/depth"
         //Everything is multiplied by 3 as its 3 verts per tri...(the verts are index)
-        int[] tris = new int[totalVerts* 3];
+        int[] tris = new int[totalTris* 3];
 
         int t = 0;
         int v = 0;
@@ -150,22 +153,37 @@ public class MeshService : IMeshService
             Point r = contour[i + 1];
 
             //TODO Rotation, use p and r to work out the "normal" direciton of q so we rotate the lip correctly...
+            Point qp = p - q;
+            Point qr = r - q;
+            Point norm = Point.Bisect(qp, qr);
+            norm *= sLipSize;
 
             //Add top surface
-            verts[v++] = new Vector3(q.X, q.Y, 0);
+            verts[v++] = new Vector3(q.X, q.Y, sLipOverhang);
             verts[v++] = new Vector3(q.X, q.Y, sLipDepth);
+            verts[v++] = new Vector3(q.X + norm.X, q.Y + norm.Y, sLipOverhang);
 
-            //Add 2 tris to the next indices
+            //Add tris to the next indices
             //Note - Last segment wraps round to the first indices...
             if (i == contour.Count - 1)
             {
-                tris[t++] = v - 2; tris[t++] = v - 1; tris[t++] = 0;
-                tris[t++] = v - 1; tris[t++] = 1; tris[t++] = 0;
+                //TOP
+                tris[t++] = v - 3; tris[t++] = v - 2; tris[t++] = 0;
+                tris[t++] = v - 2; tris[t++] = 1; tris[t++] = 0;
+
+                //LIP
+                tris[t++] = v - 3; tris[t++] = 0; tris[t++] = 2;
+                tris[t++] = v - 1; tris[t++] = v - 3; tris[t++] = 2;
             }
             else
             {
-                tris[t++] = v-2; tris[t++] = v-1; tris[t++] = v;
-                tris[t++] = v-1; tris[t++] = v+1; tris[t++] = v;
+                //TOP
+                tris[t++] = v-3; tris[t++] = v-2; tris[t++] = v;
+                tris[t++] = v-2; tris[t++] = v+1; tris[t++] = v;
+
+                //LIP
+                tris[t++] = v - 3; tris[t++] = v; tris[t++] = v + 2;
+                tris[t++] = v - 1; tris[t++] = v - 3; tris[t++] = v + 2;
             }
         }
 
