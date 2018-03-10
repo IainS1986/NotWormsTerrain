@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 using Terrain.Services;
-using Terrain.Services.Concrete;
+using TinyIoC;
 
 namespace Terrain.Debugging
 {
@@ -46,7 +46,7 @@ namespace Terrain.Debugging
             m_lineMaterial.hideFlags = HideFlags.HideAndDontSave;
             m_lineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
 
-            m_terrainService = new TerrainService();
+            m_terrainService = TinyIoCContainer.Current.Resolve<ITerrainService>();
             m_terrainService.SetDimensions(m_width, m_height);
         }
 

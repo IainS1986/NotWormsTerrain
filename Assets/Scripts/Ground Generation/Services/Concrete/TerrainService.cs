@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TinyIoC;
 using UnityEngine;
 
 namespace Terrain.Services.Concrete
@@ -20,11 +21,11 @@ namespace Terrain.Services.Concrete
 
         public TerrainService()
         {
-            m_groundGeneratorService = new GroundGeneratorService();
-            m_contourSmoothingService = new ContourSmoothingService();
-            m_marchingSquaresService = new MarchingService();
-            m_decompService = new DecompService();
-            m_meshService = new MeshService();
+            m_groundGeneratorService = TinyIoCContainer.Current.Resolve<IGroundGeneratorService>();
+            m_contourSmoothingService = TinyIoCContainer.Current.Resolve<IContourSmoothingService>();
+            m_marchingSquaresService = TinyIoCContainer.Current.Resolve<IMarchingService>();
+            m_decompService = TinyIoCContainer.Current.Resolve<IDecompService>();
+            m_meshService = TinyIoCContainer.Current.Resolve<IMeshService>();
         }
 
         public void SetDimensions(int width, int height)
