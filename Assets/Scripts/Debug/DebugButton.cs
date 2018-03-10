@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Terrain.Utility.Services;
+using TinyIoC;
 using UnityEngine;
 
 namespace Terrain.Debugging
@@ -13,6 +15,18 @@ namespace Terrain.Debugging
         public static int Width = 150;
 
         public static int Height = 20;
+
+        private static ILoggingService m_loggingService;
+        private static ILoggingService Logging
+        {
+            get
+            {
+                if (m_loggingService == null)
+                    m_loggingService = TinyIoCContainer.Current.Resolve<ILoggingService>();
+
+                return m_loggingService;
+            }
+        }
 
         private static IEnumerable<Brush> m_brushTypes;
         private static IEnumerable<Brush> BrushTypes
@@ -36,8 +50,8 @@ namespace Terrain.Debugging
                     action();
                 DateTime after = DateTime.Now;
 
-                //if(string.IsNullOrEmpty(s) == false)
-                //    Debug.Log(string.Format("{0} took {1}ms", s, (after - before).TotalMilliseconds));
+                if (string.IsNullOrEmpty(s) == false)
+                    Logging.Log(string.Format("{0} took {1}ms", s, (after - before).TotalMilliseconds));
             }
         }
 

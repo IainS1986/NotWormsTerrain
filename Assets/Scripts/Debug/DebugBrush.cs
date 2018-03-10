@@ -3,6 +3,8 @@ using System.Collections;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using TinyIoC;
+using Terrain.Utility.Services;
 
 namespace Terrain.Debugging
 {
@@ -14,7 +16,9 @@ namespace Terrain.Debugging
         STONE = 2,
     };
 
-    public class DebugBrush : MonoBehaviour {
+    public class DebugBrush : MonoBehaviour
+    {
+        private ILoggingService m_logging;
 
         public Brush m_brush = Brush.NONE;
 
@@ -35,6 +39,7 @@ namespace Terrain.Debugging
             m_lineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
 
             m_brushTypes = Enum.GetValues(typeof(Brush)).Cast<Brush>();
+            m_logging = TinyIoCContainer.Current.Resolve<ILoggingService>();
         }
 
         void Update()
@@ -47,8 +52,8 @@ namespace Terrain.Debugging
                 DateTime now = DateTime.Now;
                 bool change = m_main.TerrainService.GroundChangeSelectiveRebuild(xx, yy, m_size, (int)m_brush);
                 TimeSpan tspan = DateTime.Now.Subtract(now);
-                //if(change)
-                //    Debug.Log(string.Format("ReBuild took {0} ms", tspan.TotalMilliseconds));
+                if (change)
+                    m_logging.Log(string.Format("ReBuild took {0} ms", tspan.TotalMilliseconds));
             }
         }
 
