@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class Decomp
 {
-    public List<Point> Points;
+    public List<Vector2> Points;
     public int[] Tris;
 }
 
@@ -33,7 +33,7 @@ public class DecompService : IDecompService
     {
         List<PolygonPoint> edge = new List<PolygonPoint>();
         for (int i = 0; i < chunk.Edge.Count; i++)
-            edge.Add(new PolygonPoint(chunk.Edge[i].X, chunk.Edge[i].Y));
+            edge.Add(new PolygonPoint(chunk.Edge[i].x, chunk.Edge[i].y));
 
         List<Polygon> holes = new List<Polygon>();
         if (chunk.Holes != null)
@@ -42,7 +42,7 @@ public class DecompService : IDecompService
             {
                 List<PolygonPoint> hole = new List<PolygonPoint>();
                 for (int j = 0; j < chunk.Holes[i].Count; j++)
-                    hole.Add(new PolygonPoint(chunk.Holes[i][j].X, chunk.Holes[i][j].Y));
+                    hole.Add(new PolygonPoint(chunk.Holes[i][j].x, chunk.Holes[i][j].y));
 
                 holes.Add(new Polygon(hole));
             }
@@ -58,7 +58,7 @@ public class DecompService : IDecompService
         IList<TriangulationPoint> points = poly.Points;
         IList<DelaunayTriangle> tris = poly.Triangles;
 
-        List<Point> finalPoints = new List<Point>();
+        List<Vector2> finalPoints = new List<Vector2>();
         int[] finalTris = new int[tris.Count * 3];
         Dictionary<TriangulationPoint, int> pointToIndex = new Dictionary<TriangulationPoint, int>();
         for (int t = 0; t < tris.Count; t++)
@@ -74,7 +74,7 @@ public class DecompService : IDecompService
                 }
                 else
                 {
-                    finalPoints.Add(new Point() { X = tri.Points[i].Xf, Y = tri.Points[i].Yf });
+                    finalPoints.Add(new Vector2() { x = tri.Points[i].Xf, y = tri.Points[i].Yf });
                     pointToIndex[tri.Points[i]] = finalPoints.Count - 1;
                     finalTris[t * 3 + i] = finalPoints.Count - 1;
                 }

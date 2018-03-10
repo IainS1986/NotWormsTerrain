@@ -9,7 +9,7 @@ public class MeshService : IMeshService
 
     private static float sLipDepth = 5;
     private static float sLipOverhang = -0.1f;
-    private static float sLipSize = 2;
+    private static float sLipSize = 1;
 
     public MeshService()
     {
@@ -65,7 +65,7 @@ public class MeshService : IMeshService
         Vector3[] verts = new Vector3[chunk.Poly.Points.Count];
         int[] tris = new int[chunk.Poly.Tris.Length];
 
-        for (int i = 0; i < verts.Length; i++) verts[i] = new Vector3(chunk.Poly.Points[i].X, chunk.Poly.Points[i].Y, 0);
+        for (int i = 0; i < verts.Length; i++) verts[i] = new Vector3(chunk.Poly.Points[i].x, chunk.Poly.Points[i].y, 0);
         for (int i = 0; i < tris.Length; i++) tris[i] = chunk.Poly.Tris[i];
 
         //Tris are backwards
@@ -146,29 +146,29 @@ public class MeshService : IMeshService
 
         int t = 0;
         int v = 0;
-        Point previousNorm = new Point();
+        Vector2 previousNorm = new Vector2();
         for(int i=0; i<contour.Count; i++)
         {
-            Point p = contour[i - 1];
-            Point q = contour[i];
-            Point r = contour[i + 1];
+            Vector2 p = contour[i - 1];
+            Vector2 q = contour[i];
+            Vector2 r = contour[i + 1];
 
             //TODO Rotation, use p and r to work out the "normal" direciton of q so we rotate the lip correctly...
-            Point qp = Point.Normalize(p - q);
-            Point qr = Point.Normalize(r - q);
+            Vector2 qp = (p - q).normalized;
+            Vector2 qr = (r - q).normalized;
 
-            Point norm = Point.Bisect(qp, qr);
+            Vector2 norm = (qp + qr).normalized;
             norm *= sLipSize;
 
             //Convex/Concave flip
-            var cross = Point.Cross(qp, qr);
+            var cross = Vector2DExtensionMethods.Cross(qp, qr);
             if (cross < 0)
                 norm = -norm;
             
             //If we have a perfectly straight line, then the normal (or bisect) will be 0,0
             //So as a simple fix for this, we just copy the lip vector from the previous lip
-            if (Mathf.Approximately(qp.X, -qr.X) &&
-                Mathf.Approximately(qp.Y, -qr.Y))
+            if (Mathf.Approximately(qp.x, -qr.x) &&
+                Mathf.Approximately(qp.y, -qr.y))
             {
                 norm = previousNorm;
             }
@@ -176,9 +176,9 @@ public class MeshService : IMeshService
             previousNorm = norm;
 
             //Add top surface
-            verts[v++] = new Vector3(q.X, q.Y, sLipOverhang);
-            verts[v++] = new Vector3(q.X, q.Y, sLipDepth);
-            verts[v++] = new Vector3(q.X + norm.X, q.Y + norm.Y, sLipOverhang);
+            verts[v++] = new Vector3(q.x, q.y, sLipOverhang);
+            verts[v++] = new Vector3(q.x, q.y, sLipDepth);
+            verts[v++] = new Vector3(q.x + norm.x, q.y + norm.y, sLipOverhang);
 
             //Add tris to the next indices
             //Note - Last segment wraps round to the first indices...

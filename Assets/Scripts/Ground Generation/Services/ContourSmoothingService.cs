@@ -38,13 +38,13 @@ public class ContourSmoothingService : IContourSmoothingService
             int w = 0;
             for (int j = -m_smoothWeights.Length / 2; j <= m_smoothWeights.Length / 2; j++)
             {
-                x += vs[i + j].X * m_smoothWeights[j + (m_smoothWeights.Length / 2)];
-                y += vs[i + j].Y * m_smoothWeights[j + (m_smoothWeights.Length / 2)];
+                x += vs[i + j].x * m_smoothWeights[j + (m_smoothWeights.Length / 2)];
+                y += vs[i + j].y * m_smoothWeights[j + (m_smoothWeights.Length / 2)];
                 w += m_smoothWeights[j + (m_smoothWeights.Length / 2)];
             }
             x /= w;
             y /= w;
-            smooth.Add(new Point() { X = x, Y = y });
+            smooth.Add(new Vector2() { x = x, y = y });
         }
 
         vs.CopyFrom(smooth);
@@ -73,15 +73,15 @@ public class ContourSmoothingService : IContourSmoothingService
         int count = 0;
         for (int i = 0; i < vs.Count; i++)
         {
-            Point a = vs[i - 1];
-            Point b = vs[i];
-            Point c = vs[i + 1];
+            Vector2 a = vs[i - 1];
+            Vector2 b = vs[i];
+            Vector2 c = vs[i + 1];
 
             //Remove b if its the same X or same Y as a and c
-            bool abX = UnityEngine.Mathf.Approximately(a.X, b.X);
-            bool bcX = UnityEngine.Mathf.Approximately(b.X, c.X);
-            bool abY = UnityEngine.Mathf.Approximately(a.Y, b.Y);
-            bool bcY = UnityEngine.Mathf.Approximately(b.Y, c.Y);
+            bool abX = UnityEngine.Mathf.Approximately(a.x, b.x);
+            bool bcX = UnityEngine.Mathf.Approximately(b.x, c.x);
+            bool abY = UnityEngine.Mathf.Approximately(a.y, b.y);
+            bool bcY = UnityEngine.Mathf.Approximately(b.y, c.y);
             if ((abX && bcX) || (abY && bcY))
             {
                 count++;

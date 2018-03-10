@@ -187,16 +187,16 @@ public class Main : MonoBehaviour
                 GL.Color(col);
                 for(int i=0; i<chunk.Value.Edge.Count; i++)
                 {
-                    GL.Vertex3(chunk.Value.Edge[i].X, chunk.Value.Edge[i].Y, 0);
-                    GL.Vertex3(chunk.Value.Edge[i + 1].X, chunk.Value.Edge[i + 1].Y, 0);
+                    GL.Vertex3(chunk.Value.Edge[i].x, chunk.Value.Edge[i].y, 0);
+                    GL.Vertex3(chunk.Value.Edge[i + 1].x, chunk.Value.Edge[i + 1].y, 0);
 
                     //Render point
                     GL.End();
                     GL.Begin(GL.QUADS);
                     GL.Color(Color.black);
                     float s = 0.05f;
-                    float xx = chunk.Value.Edge[i].X;
-                    float yy = chunk.Value.Edge[i].Y;
+                    float xx = chunk.Value.Edge[i].x;
+                    float yy = chunk.Value.Edge[i].y;
                     GL.Vertex3(xx - s, yy - s, 0);
                     GL.Vertex3(xx + s, yy - s, 0);
                     GL.Vertex3(xx + s, yy + s, 0);
@@ -211,16 +211,16 @@ public class Main : MonoBehaviour
                     for(int i=0; i<hole.Count; i++)
                     {
                         GL.Color(Color.blue);
-                        GL.Vertex3(hole[i].X, hole[i].Y, 0);
-                        GL.Vertex3(hole[i + 1].X, hole[i + 1].Y, 0);
+                        GL.Vertex3(hole[i].x, hole[i].y, 0);
+                        GL.Vertex3(hole[i + 1].x, hole[i + 1].y, 0);
 
                         //Render Point
                         GL.End();
                         GL.Begin(GL.QUADS);
                         GL.Color(Color.black);
                         float s = 0.05f;
-                        float xx = hole[i].X;
-                        float yy = hole[i].Y;
+                        float xx = hole[i].x;
+                        float yy = hole[i].y;
                         GL.Vertex3(xx - s, yy - s, 0);
                         GL.Vertex3(xx + s, yy - s, 0);
                         GL.Vertex3(xx + s, yy + s, 0);
@@ -258,24 +258,24 @@ public class Main : MonoBehaviour
                 else
                     col = STONE_COL;
 
-                List<Point> points = poly.Points;
+                List<Vector2> points = poly.Points;
                 int[] tris = poly.Tris;
 
                 GL.Color(col);
                 for (int i = 0; i < tris.Length / 3; i++)
                 {
-                    Point pa = points[tris[i * 3 + 0]];
-                    Point pb = points[tris[i * 3 + 1]];
-                    Point pc = points[tris[i * 3 + 2]];
+                    Vector2 pa = points[tris[i * 3 + 0]];
+                    Vector2 pb = points[tris[i * 3 + 1]];
+                    Vector2 pc = points[tris[i * 3 + 2]];
 
-                    GL.Vertex3(pa.X, pa.Y, 0);
-                    GL.Vertex3(pb.X, pb.Y, 0);
+                    GL.Vertex3(pa.x, pa.y, 0);
+                    GL.Vertex3(pb.x, pb.y, 0);
 
-                    GL.Vertex3(pb.X, pb.Y, 0);
-                    GL.Vertex3(pc.X, pc.Y, 0);
+                    GL.Vertex3(pb.x, pb.y, 0);
+                    GL.Vertex3(pc.x, pc.y, 0);
 
-                    GL.Vertex3(pc.X, pc.Y, 0);
-                    GL.Vertex3(pa.X, pa.Y, 0);
+                    GL.Vertex3(pc.x, pc.y, 0);
+                    GL.Vertex3(pa.x, pa.y, 0);
                 }
             }
         }

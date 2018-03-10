@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 public class VertexSequence
 {
-    private List<Point> Vertices { get; set; }
+    private List<Vector2> Vertices { get; set; }
 
     public VertexSequence(){
-        Vertices = new List<Point>();
+        Vertices = new List<Vector2>();
     }
     
-    public Point this[int i]{
+    public Vector2 this[int i]{
         get
         {
             if (i < 0)
@@ -30,11 +31,11 @@ public class VertexSequence
         get{ return Vertices.Count;}
     }
     
-    public void Add(Point a){
+    public void Add(Vector2 a){
         Vertices.Add(a);
     }
     
-    public bool Remove(Point a){
+    public bool Remove(Vector2 a){
         return Vertices.Remove(a);
     }
 

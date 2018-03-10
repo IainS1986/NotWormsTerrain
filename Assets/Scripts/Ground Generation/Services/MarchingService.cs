@@ -137,7 +137,7 @@ public class MarchingService : IMarchingService
                 if (ground.Dots[cury, curx].Value == g)
                     ground.Dots[cury, curx].Chunk = chunkID;
 
-                contour.Add(new Point() { X = curx - 0.5f, Y = cury - 0.5f });
+                contour.Add(new Vector2() { x = curx - 0.5f, y = cury - 0.5f });
                 prevx = curx;
                 prevy = cury;
             }
