@@ -47,8 +47,8 @@ namespace Terrain.Debugging
                 DateTime now = DateTime.Now;
                 bool change = m_main.TerrainService.GroundChangeSelectiveRebuild(xx, yy, m_size, (int)m_brush);
                 TimeSpan tspan = DateTime.Now.Subtract(now);
-                if(change)
-                    Debug.Log(string.Format("ReBuild took {0} ms", tspan.TotalMilliseconds));
+                //if(change)
+                //    Debug.Log(string.Format("ReBuild took {0} ms", tspan.TotalMilliseconds));
             }
         }
 

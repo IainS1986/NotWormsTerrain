@@ -36,8 +36,8 @@ namespace Terrain.Debugging
                     action();
                 DateTime after = DateTime.Now;
 
-                if(string.IsNullOrEmpty(s) == false)
-                    Debug.Log(string.Format("{0} took {1}ms", s, (after - before).TotalMilliseconds));
+                //if(string.IsNullOrEmpty(s) == false)
+                //    Debug.Log(string.Format("{0} took {1}ms", s, (after - before).TotalMilliseconds));
             }
         }
 
