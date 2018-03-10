@@ -19,7 +19,7 @@ public class DebugBrush : MonoBehaviour {
     private int m_size = 2;
 
     [SerializeField]
-    private Main m_main;
+    private DebugMain m_main;
 
     private Material m_lineMaterial;
 

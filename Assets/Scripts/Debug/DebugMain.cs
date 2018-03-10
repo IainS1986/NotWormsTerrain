@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class Main : MonoBehaviour
+public class DebugMain : MonoBehaviour
 {
     private ITerrainService m_terrainService;
 
