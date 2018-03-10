@@ -9,6 +9,7 @@ namespace Terrain.Services.Concrete
     {
         private readonly IGroundGeneratorService m_groundGeneratorService;
         private readonly IMarchingService m_marchingSquaresService;
+        private readonly IContourOptimiserService m_contourOptimiserService;
         private readonly IContourSmoothingService m_contourSmoothingService;
         private readonly IDecompService m_decompService;
         private readonly IMeshService m_meshService;
@@ -22,6 +23,7 @@ namespace Terrain.Services.Concrete
         public TerrainService()
         {
             m_groundGeneratorService = TinyIoCContainer.Current.Resolve<IGroundGeneratorService>();
+            m_contourOptimiserService = TinyIoCContainer.Current.Resolve<IContourOptimiserService>();
             m_contourSmoothingService = TinyIoCContainer.Current.Resolve<IContourSmoothingService>();
             m_marchingSquaresService = TinyIoCContainer.Current.Resolve<IMarchingService>();
             m_decompService = TinyIoCContainer.Current.Resolve<IDecompService>();
@@ -93,6 +95,7 @@ namespace Terrain.Services.Concrete
             if (Ground.CurrentStage >= GroundStage.SMOOTHED)
             {
                 m_contourSmoothingService.SmoothContours(chunks);
+                m_contourOptimiserService.RemoveSmallContours(Ground, chunks);
             }
             if (Ground.CurrentStage >= GroundStage.VERTEX_REMOVAL)
             {
@@ -137,6 +140,7 @@ namespace Terrain.Services.Concrete
                 return;
 
             m_contourSmoothingService.SmoothContours(Ground);
+            m_contourOptimiserService.RemoveSmallContours(Ground);
 
             Ground.CurrentStage = GroundStage.SMOOTHED;
         }

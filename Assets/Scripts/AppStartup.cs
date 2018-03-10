@@ -25,6 +25,7 @@ public class AppStartup : MonoBehaviour
     private void RegisterServices()
     {
         TinyIoCContainer.Current.Register<ILoggingService>(new LoggingService());
+        TinyIoCContainer.Current.Register<IContourOptimiserService>(new ContourOptimiserService());
         TinyIoCContainer.Current.Register<IContourSmoothingService>(new ContourSmoothingService());
         TinyIoCContainer.Current.Register<IDecompService>(new DecompService());
         TinyIoCContainer.Current.Register<IGroundGeneratorService>(new GroundGeneratorService());
