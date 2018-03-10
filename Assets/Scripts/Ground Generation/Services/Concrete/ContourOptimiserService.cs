@@ -6,6 +6,8 @@ namespace Terrain.Services.Concrete
 {
     public class ContourOptimiserService : IContourOptimiserService
     {
+        private const int cMinVertexCount = 16;
+
         public void RemoveSmallContours(Ground ground)
         {
             RemoveSmallContours(ground, ground.Chunks);
@@ -46,7 +48,7 @@ namespace Terrain.Services.Concrete
         // will be too small.
         private bool ContourIsTooSmall(VertexSequence seq)
         {
-            return (seq == null) ? true : seq.Count < 10;
+            return (seq == null) ? true : seq.Count < cMinVertexCount;
         }
     }
 }
