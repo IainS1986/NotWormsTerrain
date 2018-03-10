@@ -75,6 +75,8 @@ namespace Terrain.Services.Concrete
             //Clear ChunkID lookups
             foreach (var id in chunkIdsToRemove)
             {
+                //TODO I have had this line error with key not found in the Ground.Chunks
+                //TODO No Idea how this has happened, need to investigate at some point....
                 var chunk = Ground.Chunks[id.Key];
                 chunk.Dispose();
                 Ground.Chunks.Remove(id.Key);
