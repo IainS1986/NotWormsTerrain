@@ -53,10 +53,10 @@ namespace Terrain.Services.Concrete
             Dictionary<int, bool> chunkIdsToRemove = new Dictionary<int, bool>();
             for (int i = 0; i < s + (border * 2); i++)
             {
-                int xx = x - border + i;
+                int xx = x - (s / 2) - border + i;
                 for (int j = 0; j < s + (border * 2); j++)
                 {
-                    int yy = y - border + j;
+                    int yy = y - (s / 2) - border + j;
 
                     //Ensure we don't go out of bounds
                     if (xx >= 0 && xx < Ground.Width && yy >= 0 && yy < Ground.Height)
