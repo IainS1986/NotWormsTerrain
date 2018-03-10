@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Vector2DExtensionMethods
+namespace Terrain.Utility
 {
-    public static float Cross(Vector2 a, Vector2 b)
+    public static class Vector2DExtensionMethods
     {
-        return a.x * b.y - a.y * b.x;
+        public static float Cross(Vector2 a, Vector2 b)
+        {
+            return a.x * b.y - a.y * b.x;
+        }
     }
 }
