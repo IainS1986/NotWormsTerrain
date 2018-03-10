@@ -80,24 +80,20 @@ public class DebugMain : MonoBehaviour
         BottomPane();
     }
 
-    void BottomPane(){
-        int b = 10;
-        int w = 150;
-        int h = 20;
-        
-        int num_buttons = 8;
-        Rect boundary = new Rect(b/2, Screen.height - h - b - (b/2) - h, num_buttons * (b+w), h + b + h);
+    void BottomPane()
+    {
+        Rect boundary = DebugButton.GetMainWidgetRect();
         GUI.Box(boundary, "GROUND GEN");
 
-        int i = 0;
-        AddButton(i++, "DOTS", () => m_terrainService.Generate(), b, w, h);
-        AddButton(i++, "MARCH", () => m_terrainService.March(), b, w, h);
-        AddButton(i++, "SMOOTH", () => m_terrainService.SmoothContours(), b, w, h);
-        AddButton(i++, "REMOVE", () => m_terrainService.RemoveVertices(), b, w, h);
-        AddButton(i++, "DECOMP", () => m_terrainService.Decomp(), b, w, h);
-        AddButton(i++, "MESH", () => m_terrainService.Mesh(), b, w, h);
-        AddButton(i++, "LIP", () => m_terrainService.Lips(), b, w, h);
-        AddButton(i++, "ALL", () =>
+        int i = 1;
+        DebugButton.AddButton(boundary, i++, "DOTS", () => m_terrainService.Generate());
+        DebugButton.AddButton(boundary, i++, "MARCH", () => m_terrainService.March());
+        DebugButton.AddButton(boundary, i++, "SMOOTH", () => m_terrainService.SmoothContours());
+        DebugButton.AddButton(boundary, i++, "REMOVE", () => m_terrainService.RemoveVertices());
+        DebugButton.AddButton(boundary, i++, "DECOMP", () => m_terrainService.Decomp());
+        DebugButton.AddButton(boundary, i++, "MESH", () => m_terrainService.Mesh());
+        DebugButton.AddButton(boundary, i++, "LIP", () => m_terrainService.Lips());
+        DebugButton.AddButton(boundary, i++, "ALL", () =>
         {
             m_terrainService.Generate();
             m_terrainService.March();
@@ -106,20 +102,7 @@ public class DebugMain : MonoBehaviour
             m_terrainService.Decomp();
             m_terrainService.Mesh();
             m_terrainService.Lips();
-        }, b, w, h);
-    }
-
-    private void AddButton(int i, string s, Action action, int b, int w, int h)
-    {
-        Rect r = new Rect(b * (i+1) + w * i, Screen.height - h - b, w, h);
-        if (GUI.Button(r, s))
-        {
-            DateTime before = DateTime.Now;
-            if (action != null)
-                action();
-            DateTime after = DateTime.Now;
-            Debug.Log(string.Format("{0} took {1}ms", s, (after - before).TotalMilliseconds));
-        }
+        });
     }
 
     private void RenderDots()

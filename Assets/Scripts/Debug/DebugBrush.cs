@@ -1,17 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Linq;
+using System.Collections.Generic;
+
+public enum Brush
+{
+    NONE = -1,
+    AIR = 0,
+    EARTH = 1,
+    STONE = 2,
+};
 
 public class DebugBrush : MonoBehaviour {
-
-    public enum Brush
-    {
-        NONE = -1,
-        AIR = 0,
-        EARTH = 1,
-        STONE = 2,
-    };
-
 
     public Brush m_brush = Brush.NONE;
 
@@ -23,11 +24,15 @@ public class DebugBrush : MonoBehaviour {
 
     private Material m_lineMaterial;
 
+    private IEnumerable<Brush> m_brushTypes;
+
     public void Start()
     {
         m_lineMaterial = new Material(Shader.Find("Particles/Alpha Blended"));
         m_lineMaterial.hideFlags = HideFlags.HideAndDontSave;
         m_lineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
+
+        m_brushTypes = Enum.GetValues(typeof(Brush)).Cast<Brush>();
     }
 
     void Update()
@@ -47,36 +52,13 @@ public class DebugBrush : MonoBehaviour {
 
     void OnGUI()
     {
-        int b = 10;
-        int w = 120;
-        int h = 20;
-
-        int num_buttons = 8;
-        Rect boundary = new Rect(b / 2, b / 2, w + b, num_buttons * (b + h) + h);
+        Rect boundary = DebugButton.GetBrushWidgetRect();
         GUI.Box(boundary, "BRUSH");
 
-        Rect r = new Rect(b, b * 1 + h * 1, w, h);
-        if (GUI.Button(r, (m_brush == Brush.NONE) ? "NONE" : "none"))
+        int i = 1;
+        foreach(var brush in m_brushTypes)
         {
-            m_brush = Brush.NONE;
-        }
-
-        r = new Rect(b, b * 2 + h * 2, w, h);
-        if (GUI.Button(r, (m_brush == Brush.AIR) ? "AIR" : "air"))
-        {
-            m_brush = Brush.AIR;
-        }
-
-        r = new Rect(b, b * 3 + h * 3, w, h);
-        if (GUI.Button(r, (m_brush == Brush.EARTH) ? "EARTH" : "earth"))
-        {
-            m_brush = Brush.EARTH;
-        }
-
-        r = new Rect(b, b * 4 + h * 4, w, h);
-        if (GUI.Button(r, (m_brush == Brush.STONE) ? "STONE" : "stone"))
-        {
-            m_brush = Brush.STONE;
+            DebugButton.AddButton(boundary, i++, (m_brush == brush) ? brush.ToString().ToUpper() : brush.ToString().ToLower(), () => m_brush = brush);
         }
     }
 
