@@ -4,59 +4,62 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class DebugButton
+namespace Terrain.Debugging
 {
-    public static int Border = 10;
-
-    public static int Width = 150;
-
-    public static int Height = 20;
-
-    private static IEnumerable<Brush> m_brushTypes;
-    private static IEnumerable<Brush> BrushTypes
+    public class DebugButton
     {
-        get
+        public static int Border = 10;
+
+        public static int Width = 150;
+
+        public static int Height = 20;
+
+        private static IEnumerable<Brush> m_brushTypes;
+        private static IEnumerable<Brush> BrushTypes
         {
-            if(m_brushTypes == null)
-                m_brushTypes = Enum.GetValues(typeof(Brush)).Cast<Brush>();
+            get
+            {
+                if(m_brushTypes == null)
+                    m_brushTypes = Enum.GetValues(typeof(Brush)).Cast<Brush>();
 
-            return m_brushTypes;
+                return m_brushTypes;
+            }
         }
-    }
 
-    public static void AddButton(Rect boundary, int i, string s, Action action)
-    {
-        Rect r = new Rect(Border, boundary.y + (Border * i + Height * i), Width, Height);
-        if (GUI.Button(r, s))
+        public static void AddButton(Rect boundary, int i, string s, Action action)
         {
-            DateTime before = DateTime.Now;
-            if (action != null)
-                action();
-            DateTime after = DateTime.Now;
+            Rect r = new Rect(Border, boundary.y + (Border * i + Height * i), Width, Height);
+            if (GUI.Button(r, s))
+            {
+                DateTime before = DateTime.Now;
+                if (action != null)
+                    action();
+                DateTime after = DateTime.Now;
 
-            if(string.IsNullOrEmpty(s) == false)
-                Debug.Log(string.Format("{0} took {1}ms", s, (after - before).TotalMilliseconds));
+                if(string.IsNullOrEmpty(s) == false)
+                    Debug.Log(string.Format("{0} took {1}ms", s, (after - before).TotalMilliseconds));
+            }
         }
-    }
 
-    public static Rect GetBrushWidgetRect()
-    {
-        int y = DebugButton.Border / 2;
+        public static Rect GetBrushWidgetRect()
+        {
+            int y = DebugButton.Border / 2;
 
-        int num_buttons = BrushTypes.Count();
-        return DebugButton.GetWidgetRect(y, num_buttons);
-    }
+            int num_buttons = BrushTypes.Count();
+            return DebugButton.GetWidgetRect(y, num_buttons);
+        }
 
-    public static Rect GetMainWidgetRect()
-    {
-        Rect brushWidget = GetBrushWidgetRect();
-        int y = (int)(brushWidget.y + brushWidget.height) + Border;
+        public static Rect GetMainWidgetRect()
+        {
+            Rect brushWidget = GetBrushWidgetRect();
+            int y = (int)(brushWidget.y + brushWidget.height) + Border;
 
-        return DebugButton.GetWidgetRect(y, 8);
-    }
+            return DebugButton.GetWidgetRect(y, 8);
+        }
     
-    public static Rect GetWidgetRect(int y, int num_buttons)
-    {
-        return new Rect(DebugButton.Border / 2, y, DebugButton.Width + DebugButton.Border, num_buttons * (DebugButton.Border + DebugButton.Height) + DebugButton.Height + (DebugButton.Border / 2));
+        public static Rect GetWidgetRect(int y, int num_buttons)
+        {
+            return new Rect(DebugButton.Border / 2, y, DebugButton.Width + DebugButton.Border, num_buttons * (DebugButton.Border + DebugButton.Height) + DebugButton.Height + (DebugButton.Border / 2));
+        }
     }
 }

@@ -2,56 +2,59 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Ground
+namespace Terrain
 {
-    public Dot[,] Dots { get; set; }
-    public Dictionary<int, GroundChunk> Chunks { get; set; }
-    public int Height { get; set; }
-    public int Width { get; set; }
-    public GroundStage CurrentStage { get; set; }
-
-    public Ground(int _w, int _h)
+    public class Ground
     {
-        Width = _w;
-        Height = _h;
+        public Dot[,] Dots { get; set; }
+        public Dictionary<int, GroundChunk> Chunks { get; set; }
+        public int Height { get; set; }
+        public int Width { get; set; }
+        public GroundStage CurrentStage { get; set; }
 
-        Dots = new Dot[Height, Width];
-        Chunks = new Dictionary<int, GroundChunk>();
-        CurrentStage = GroundStage.NONE;
-    }
-
-    public void ResetChunks()
-    {
-        if(Chunks!= null)
+        public Ground(int _w, int _h)
         {
-            foreach (var chunk in Chunks)
-                chunk.Value.Dispose();
+            Width = _w;
+            Height = _h;
+
+            Dots = new Dot[Height, Width];
+            Chunks = new Dictionary<int, GroundChunk>();
+            CurrentStage = GroundStage.NONE;
         }
-        Chunks = new Dictionary<int, GroundChunk>();
-        for(int y = 0; y<Height; y++)
+
+        public void ResetChunks()
         {
-            for(int x = 0; x<Width; x++)
+            if(Chunks!= null)
             {
-                Dots[y, x].Chunk = 0;
+                foreach (var chunk in Chunks)
+                    chunk.Value.Dispose();
+            }
+            Chunks = new Dictionary<int, GroundChunk>();
+            for(int y = 0; y<Height; y++)
+            {
+                for(int x = 0; x<Width; x++)
+                {
+                    Dots[y, x].Chunk = 0;
+                }
             }
         }
     }
-}
 
-public struct Dot
-{
-    public int Value { get; set; }
-    public int Chunk { get; set; }
-}
+    public struct Dot
+    {
+        public int Value { get; set; }
+        public int Chunk { get; set; }
+    }
 
-public enum GroundStage
-{
-    NONE = 0,
-    DOTS,
-    MARCHING,
-    SMOOTHED,
-    VERTEX_REMOVAL,
-    DECOMP,
-    MESH,
-    LIPS,
-};
+    public enum GroundStage
+    {
+        NONE = 0,
+        DOTS,
+        MARCHING,
+        SMOOTHED,
+        VERTEX_REMOVAL,
+        DECOMP,
+        MESH,
+        LIPS,
+    };
+}

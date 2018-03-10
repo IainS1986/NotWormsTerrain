@@ -3,74 +3,77 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GroundChunk 
+namespace Terrain
 {
-    private static int s_nextID = 0;
-    public static int NextID
+    public class GroundChunk 
     {
-        get { return ++s_nextID; }
-    }
-
-    public VertexSequence Edge { get; set; }
-
-    public List<VertexSequence> Holes { get; set; }
-
-    public Decomp Poly { get; set; }
-
-    public Mesh Mesh { get; set; }
-
-    public GameObject GameObject { get; set; }
-
-    public List<GameObject> Lips { get; set; }
-
-    public List<Mesh> LipMeshes { get; set; }
-
-    public int GroundType { get; set; }
-
-    public GroundChunk()
-    {
-        Holes = new List<VertexSequence>();
-        Lips = new List<GameObject>();
-        LipMeshes = new List<Mesh>();
-	}
-
-    public void Dispose()
-    {
-        DisposeMesh();
-        DisposeLips();
-    }
-
-    public void DisposeMesh()
-    {
-        if(Mesh!= null)
+        private static int s_nextID = 0;
+        public static int NextID
         {
-            MonoBehaviour.Destroy(Mesh);
+            get { return ++s_nextID; }
         }
 
-        if(GameObject!= null)
-        {
-            MonoBehaviour.Destroy(GameObject);
-        }
-    }
+        public VertexSequence Edge { get; set; }
 
-    public void DisposeLips()
-    {
-        if(Lips!= null)
+        public List<VertexSequence> Holes { get; set; }
+
+        public Decomp Poly { get; set; }
+
+        public Mesh Mesh { get; set; }
+
+        public GameObject GameObject { get; set; }
+
+        public List<GameObject> Lips { get; set; }
+
+        public List<Mesh> LipMeshes { get; set; }
+
+        public int GroundType { get; set; }
+
+        public GroundChunk()
         {
-            foreach(var lip in Lips)
+            Holes = new List<VertexSequence>();
+            Lips = new List<GameObject>();
+            LipMeshes = new List<Mesh>();
+	    }
+
+        public void Dispose()
+        {
+            DisposeMesh();
+            DisposeLips();
+        }
+
+        public void DisposeMesh()
+        {
+            if(Mesh!= null)
             {
-                MonoBehaviour.Destroy(lip);
+                MonoBehaviour.Destroy(Mesh);
             }
-            Lips.Clear();
+
+            if(GameObject!= null)
+            {
+                MonoBehaviour.Destroy(GameObject);
+            }
         }
 
-        if(LipMeshes!= null)
+        public void DisposeLips()
         {
-            foreach(var lip in LipMeshes)
+            if(Lips!= null)
             {
-                MonoBehaviour.Destroy(lip);
+                foreach(var lip in Lips)
+                {
+                    MonoBehaviour.Destroy(lip);
+                }
+                Lips.Clear();
             }
-            LipMeshes.Clear();
+
+            if(LipMeshes!= null)
+            {
+                foreach(var lip in LipMeshes)
+                {
+                    MonoBehaviour.Destroy(lip);
+                }
+                LipMeshes.Clear();
+            }
         }
     }
 }
