@@ -4,15 +4,35 @@ using UnityEngine;
 
 namespace Terrain.Services.Concrete
 {
+    /// <summary>
+    /// Terrain Generation Subservice used to allow optimisation to be run
+    /// on Ground Chunks before they are processed further. Namely this will
+    /// have functions to remove ground chunks deemed too small to produce nice
+    /// results.
+    /// </summary>
     public class ContourOptimiserService : IContourOptimiserService
     {
+        /// <summary>
+        /// Min amount of vertices a contour must contain to prevent
+        /// it from being culled.
+        /// </summary>
         private const int cMinVertexCount = 16;
 
+        /// <summary>
+        /// Removes all "small" ground chunks in the whole terrain
+        /// </summary>
+        /// <param name="ground">The Ground terrain object to process</param>
         public void RemoveSmallContours(Ground ground)
         {
             RemoveSmallContours(ground, ground.Chunks);
         }
 
+        /// <summary>
+        /// Removes all "small" ground chunks in the terrain from the sublist of chunks
+        /// provided
+        /// </summary>
+        /// <param name="ground">The Ground terrain object to remove the chunks from</param>
+        /// <param name="chunks">The sublist of ground chunks to process</param>
         public void RemoveSmallContours(Ground ground, Dictionary<int, GroundChunk> chunks)
         {
             List<int> chunksToRemove = new List<int>();

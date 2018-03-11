@@ -8,13 +8,28 @@ using UnityEngine;
 
 namespace Terrain.Services.Concrete
 {
+    /// <summary>
+    /// Terrain Generation Subservice that decomposites ground chunks ready for mesh generation
+    /// and physics simulation. This interacts with the Poly2Tri libraries from Farseer Physics
+    /// which will do the actual Decomposition itself.
+    /// </summary>
     public class DecompService : IDecompService
     {
+        /// <summary>
+        /// Decomposites all ground chunks in the provided ground terrain object.
+        /// This will decomposite ground chunks that contain holes too.
+        /// </summary>
+        /// <param name="ground">The ground terrain to decomposite all chunks in</param>
         public void Decomp(Ground ground)
         {
             Decomp(ground.Chunks);
         }
 
+        /// <summary>
+        /// Decomposites all ground chunks passed in
+        /// This will decomposite ground chunks that contain holes too.
+        /// </summary>
+        /// <param name="chunks">The sublist of all chunks we want to decomposite</param>
         public void Decomp(Dictionary<int, GroundChunk> chunks)
         {
             foreach (var chunk in chunks)
@@ -24,7 +39,13 @@ namespace Terrain.Services.Concrete
             }
         }
 
-        //TODO Drop vertex point ect and just use PolygonPoint throughout?
+        /// <summary>
+        /// This decomposites the provided ground chunk, supporting holes too.
+        /// This will convert the ground chunk into a Polygon object that is then
+        /// passed to the Poly2Tri library which returns the triangle arrays of 
+        /// decomposition.
+        /// </summary>
+        /// <param name="chunk"></param>
         private void Decomp(GroundChunk chunk)
         {
             List<PolygonPoint> edge = new List<PolygonPoint>();
