@@ -13,6 +13,8 @@ namespace Terrain
             get { return ++s_nextID; }
         }
 
+        public int ID { get; set; }
+
         public VertexSequence Edge { get; set; }
 
         public List<VertexSequence> Holes { get; set; }
@@ -31,6 +33,7 @@ namespace Terrain
 
         public GroundChunk()
         {
+            ID = NextID;
             Holes = new List<VertexSequence>();
             Lips = new List<GameObject>();
             LipMeshes = new List<Mesh>();

@@ -83,9 +83,15 @@ namespace Terrain.Services.Concrete
             }
             //Clear GroundToChunk values (Quicker way to do this?)
             for (int a = 0; a < Ground.Width; a++)
+            {
                 for (int b = 0; b < Ground.Height; b++)
+                {
                     if (chunkIdsToRemove.ContainsKey(Ground.Dots[b, a].Chunk))
+                    {
                         Ground.Dots[b, a].Chunk = 0;
+                    }
+                }
+            }
 
             //Preprocess
             m_groundGeneratorService.DotRemoval(minx, miny, s + (border * 2), s + (border * 2), Ground);

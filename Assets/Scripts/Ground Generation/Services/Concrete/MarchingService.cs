@@ -52,16 +52,16 @@ namespace Terrain.Services.Concrete
                         }
                         else
                         {
-                            cID = GroundChunk.NextID;
                             owner = new GroundChunk();
                             owner.GroundType = g;
+                            cID = owner.ID;
                             ground.Chunks.Add(cID, owner);
 
                             chunks.Add(cID, owner);
                         }
 
                         //Get Contour
-                        VertexSequence contour = FindContour(x, y, g, cID, owner, ground);
+                        VertexSequence contour = FindContour(x, y, g, owner, ground);
 
                         if (neighbourSame)
                             owner.Holes.Add(contour);
@@ -83,7 +83,7 @@ namespace Terrain.Services.Concrete
             }
         }
 
-        private VertexSequence FindContour(int x, int y, int g, int chunkID, GroundChunk owner, Ground ground)
+        private VertexSequence FindContour(int x, int y, int g, GroundChunk owner, Ground ground)
         {
             //Contour
             VertexSequence contour = new VertexSequence();
@@ -137,7 +137,7 @@ namespace Terrain.Services.Concrete
                     }
 
                     if (ground.Dots[cury, curx].Value == g)
-                        ground.Dots[cury, curx].Chunk = chunkID;
+                        ground.Dots[cury, curx].Chunk = owner.ID;
 
                     contour.Add(new Vector2() { x = curx - 0.5f, y = cury - 0.5f });
                     prevx = curx;

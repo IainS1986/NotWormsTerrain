@@ -39,8 +39,24 @@ namespace Terrain.Services.Concrete
                     chunk.Value.Holes.Remove(hole);
             }
 
+            //Clear dot chunk links
+            for (int a = 0; a < ground.Width; a++)
+            {
+                for (int b = 0; b < ground.Height; b++)
+                {
+                    if (ground.Dots[b, a].Chunk != 0 && chunksToRemove.Contains(ground.Dots[b, a].Chunk))
+                    {
+                        ground.Dots[b, a].Value = 0;
+                        ground.Dots[b, a].Chunk = 0;
+                    }
+                }
+            }
+
+            //Clear chunk objects
             foreach (int id in chunksToRemove)
+            {
                 chunks.Remove(id);
+            }
         }
 
         // TODO would be nice for this to actually review poly surface area....but for now lets keep
