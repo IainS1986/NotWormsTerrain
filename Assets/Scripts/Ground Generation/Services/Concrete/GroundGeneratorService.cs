@@ -4,15 +4,50 @@ using UnityEngine;
 
 namespace Terrain.Services.Concrete
 {
+    /// <summary>
+    /// Ground Terrain Subservice used to generate the underlaying dots
+    /// used to generate the terrain. This service will have some procedural
+    /// elements to generate "nice" looking terrain at random
+    /// 
+    /// This generator will generate a random starting point for a material type
+    /// and then "paint" circles of different sizes in an iterative pattern from this
+    /// point. This will also try and spread each chunk of material evenly across the terrain.
+    /// 
+    /// The terrain generated will be random every time.
+    /// </summary>
     public class GroundGeneratorService : IGroundGeneratorService
     {
+        /// <summary>
+        /// How many chunks of terrain do we want to randomly produces for each material type.
+        /// </summary>
         private int[] m_chunk = new int[] { 2, 2 };
+
+        /// <summary>
+        /// How many passes are run for each material, this is the number of circles/blotches
+        /// to add for each piece of terrain of that material type
+        /// </summary>
         private int[] m_passes = new int[] { 256, 128 };
+
+        /// <summary>
+        /// The max range (positive and negative) to "move" between passes in the ground
+        /// when generating. (both X and Y movement)
+        /// </summary>
         private int[] m_moves = new int[] { 20, 10 };
+
+        /// <summary>
+        /// The sizes of the circles/blotches used when generating the terrain
+        /// </summary>
         private int[] m_sizes = new int[] { 10, 5 };
 
+        /// <summary>
+        /// Total number of materials to add to the terrain
+        /// </summary>
         private int m_totalMaterials = 2;//TODO Expose
 
+        /// <summary>
+        /// Generates a random terrain of dots in the provided Ground object.
+        /// </summary>
+        /// <param name="ground">The ground object to generates the terrain in</param>
         public void Generate(Ground ground)
         {
             if(ground.Chunks!= null)
@@ -56,6 +91,16 @@ namespace Terrain.Services.Concrete
             RemoveDiagonals(0, 0, ground.Width, ground.Height, ground);
         }
 
+        /// <summary>
+        /// An optimisation function used to tidy up bits of the terrain that could pose
+        /// problems during generation. Namely this will remove single dots of one terrain type
+        /// that could not produce ground chunks of a standard worth dealing with.
+        /// </summary>
+        /// <param name="xx">The x index in the terrain to start scanning</param>
+        /// <param name="yy">The y index in the terrain to start scanning</param>
+        /// <param name="ww">The number of dots in the width to scan for</param>
+        /// <param name="hh">The number of dots in the height to scan for</param>
+        /// <param name="ground">The Ground object to scan and remove dots in the terrain for</param>
         public void DotRemoval(int xx, int yy, int ww, int hh, Ground ground)
         {
             for (int x = xx; x < xx + ww; x++)
@@ -82,6 +127,22 @@ namespace Terrain.Services.Concrete
             }
         }
 
+        /// <summary>
+        /// An optimisation function used to tidy up bits of the terrain that could pose
+        /// problems during generation. Namely this will remove diagonal dots that don't
+        /// scan nicely into meshes. For example,
+        /// o X
+        /// X o
+        /// 
+        /// This will remove this Diagonal result by turning it into something like...
+        /// X X
+        /// X X
+        /// </summary>
+        /// <param name="xx">The x index in the terrain to start scanning</param>
+        /// <param name="yy">The y index in the terrain to start scanning</param>
+        /// <param name="ww">The number of dots in the width to scan for</param>
+        /// <param name="hh">The number of dots in the height to scan for</param>
+        /// <param name="ground">The Ground object to scan and remove dots in the terrain for</param>
         public void RemoveDiagonals(int xx, int yy, int ww, int hh, Ground ground)
         {
             for (int x = xx; x < xx + ww; x++)
@@ -104,6 +165,17 @@ namespace Terrain.Services.Concrete
             }
         }
 
+        /// <summary>
+        /// A helper function to "fill" a section of the ground terrain into a specified ground
+        /// type. It will not throw an array out of bounds exception as it will be safely clamped
+        /// to the terrain boundary.
+        /// </summary>
+        /// <param name="x">The X index to start filling from</param>
+        /// <param name="y">The Y index to start filling from</param>
+        /// <param name="r">The radius in a circle from (x, y) to fill</param>
+        /// <param name="type">The ground type to fill with</param>
+        /// <param name="ground">The ground object to fill terrain in</param>
+        /// <returns>TRUE if any dots in the terrain were altered, otherwise FALSE</returns>
         public bool SafeGroundFillForGenerator(int x, int y, int r, int type, Ground ground)
         {
             bool change = false;
