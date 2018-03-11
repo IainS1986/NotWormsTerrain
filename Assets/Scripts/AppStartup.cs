@@ -7,8 +7,18 @@ using Terrain.Utility.Services.Concrete;
 using TinyIoC;
 using UnityEngine;
 
+/// <summary>
+/// AppStartup class is used to have functions
+/// we want to run at Application start, or at
+/// Scene start.
+/// </summary>
 public class AppStartup : MonoBehaviour
 {
+    /// <summary>
+    /// Used to ensure functionality we only
+    /// want to run at Application Startup is done once
+    /// during the course of the session.
+    /// </summary>
     public static bool sFirstRun  = true;
 
     void Awake()
@@ -22,6 +32,11 @@ public class AppStartup : MonoBehaviour
         DestroyObject(gameObject);
     }
 
+
+    /// <summary>
+    /// Registers singleton services with their interfaces in TinyIoC. This will only ever
+    /// trigger once in the first AppStartup object instantiated.
+    /// </summary>
     private void RegisterServices()
     {
         TinyIoCContainer.Current.Register<ILoggingService>(new LoggingService());

@@ -7,32 +7,72 @@ using TinyIoC;
 
 namespace Terrain.Debugging
 {
+    /// <summary>
+    /// The main debug class that handles displaying buttons
+    /// that allow the user to trigger the various stages of terrain
+    /// generation
+    /// </summary>
     public class DebugMain : MonoBehaviour
     {
+        /// <summary>
+        /// The ITerrainService that contains the ground data the buttons
+        /// in this class interact with
+        /// </summary>
         private ITerrainService m_terrainService;
 
+        /// <summary>
+        /// The width in dots of the terrain object
+        /// </summary>
         [SerializeField]
         private int m_width = 512;
 
+        /// <summary>
+        /// The height in dots of the terrain object
+        /// </summary>
         [SerializeField]
         private int m_height = 128;
 
+        /// <summary>
+        /// The colour of the dots for the "earth" material
+        /// </summary>
         [SerializeField]
-        public Color EARTH_COL = new UnityEngine.Color(1,0,0,1f);
+        public Color m_earthColour = new UnityEngine.Color(1,0,0,1f);
 
+        /// <summary>
+        /// The colour of the dots for the "stone" material
+        /// </summary>
         [SerializeField]
-        public Color STONE_COL = new UnityEngine.Color(0,1,0,1f);
+        public Color m_stoneColour = new UnityEngine.Color(0,1,0,1f);
 
+        /// <summary>
+        /// Bool to denote if extra debug information should be displayed. This
+        /// includes rendering more vertice information and toggling mesh renderers
+        /// This is set during the Update function based on the DebugEnabled bool.
+        /// The reason for this mapping is to allow the bool to be altered in the editor
+        /// at runtime.
+        /// </summary>
         [SerializeField]
         private bool m_renderExtraDebug = false;
 
+        /// <summary>
+        /// The Material used in the GL rendering of the dots and edges
+        /// </summary>
         private Material m_lineMaterial;
 
+        /// <summary>
+        /// The ITerrainService that contains the ground data the buttons
+        /// in this class interact with
+        /// </summary>
         public ITerrainService TerrainService
         {
             get { return m_terrainService; }
         }
 
+        /// <summary>
+        /// Bool to denote if extra debug information should be displayed. This
+        /// includes rendering more vertice information and toggling mesh renderers
+        /// Can be toggled in the editor during runtime.
+        /// </summary>
         private bool m_debugEnabled = false;
         public bool DebugEnabled
         {
@@ -40,6 +80,9 @@ namespace Terrain.Debugging
             set { m_debugEnabled = value; OnDebugToggle(); }
         }
 
+        /// <summary>
+        /// Unity Start function called when the gameobject instantiates
+        /// </summary>
         public void Start()
         {
             m_lineMaterial = new Material(Shader.Find("Particles/Alpha Blended"));
@@ -50,6 +93,11 @@ namespace Terrain.Debugging
             m_terrainService.SetDimensions(m_width, m_height);
         }
 
+        /// <summary>
+        /// Unity update functino called once per frame. Will toggle extra debug
+        /// information based on the bool that can be set in the inspector from
+        /// the editor at runtime.
+        /// </summary>
         public void Update()
         {
             if (m_renderExtraDebug && !DebugEnabled)
@@ -58,7 +106,11 @@ namespace Terrain.Debugging
                 DebugEnabled = false;
         }
 
-        // OpenGL Rendering
+        /// <summary>
+        /// Unity function called after every frame is rendered to allow further GL
+        /// rendering calls. Will render, dot, edge, decomp and vertice information
+        /// to the screen in debug GL quads and lines.
+        /// </summary>
         public void OnPostRender()
         {
             // set the current material
@@ -71,6 +123,10 @@ namespace Terrain.Debugging
                 RenderVertices();
         }
 
+        /// <summary>
+        /// When extra debug is toggled the mesh renderers will be hidden to
+        /// allow for the GL mesh rendering to be visible.
+        /// </summary>
         private void OnDebugToggle()
         {
             //Get All Meshrenderers
@@ -79,12 +135,12 @@ namespace Terrain.Debugging
                 mr.enabled = !DebugEnabled;
         }
 
+        /// <summary>
+        /// Unity OnGUI call triggered every frame that will display the 
+        /// terrain widget and the buttons to allow various terrain generation steps
+        /// to be triggered.
+        /// </summary>
         void OnGUI()
-        {
-            BottomPane();
-        }
-
-        void BottomPane()
         {
             Rect boundary = DebugButton.GetMainWidgetRect();
             GUI.Box(boundary, "GROUND GEN");
@@ -109,6 +165,9 @@ namespace Terrain.Debugging
             });
         }
 
+        /// <summary>
+        /// Renders all the dots in the terrain using GL quads.
+        /// </summary>
         private void RenderDots()
         {
             if (m_terrainService.Ground == null ||
@@ -136,11 +195,9 @@ namespace Terrain.Debugging
                     if(val <= 0)
                         continue;
 
-                    Color col = EARTH_COL;
+                    Color col = m_stoneColour;
                     if (val == 1)
-                        col = EARTH_COL;
-                    else
-                        col = STONE_COL;
+                        col = m_earthColour;
 
                     GL.Color(col);
                     float xx = x;
@@ -154,6 +211,9 @@ namespace Terrain.Debugging
             GL.End();
         }
 
+        /// <summary>
+        /// Renders all contour edges in the terrain using GL lines.
+        /// </summary>
         private void RenderEdges()
         {
             GL.Begin(GL.LINES);
@@ -165,11 +225,9 @@ namespace Terrain.Debugging
                 foreach(var chunk in m_terrainService.Ground.Chunks)
                 {
                     //Set Colour
-                    Color col = EARTH_COL;
+                    Color col = m_stoneColour;
                     if (chunk.Value.GroundType == 1)
-                        col = EARTH_COL;
-                    else
-                        col = STONE_COL;
+                        col = m_earthColour;
 
                     GL.Color(col);
                     for(int i=0; i<chunk.Value.Edge.Count; i++)
@@ -223,6 +281,9 @@ namespace Terrain.Debugging
             GL.End();
         }
 
+        /// <summary>
+        /// Renders all the decomp object outlines using GL Lines
+        /// </summary>
         private void RenderDecomp()
         {
             GL.Begin(GL.LINES);
@@ -239,11 +300,9 @@ namespace Terrain.Debugging
                     var poly = chunk.Value.Poly;
 
                     //Set Colour
-                    Color col = EARTH_COL;
+                    Color col = m_stoneColour;
                     if (chunk.Value.GroundType == 1)
-                        col = EARTH_COL;
-                    else
-                        col = STONE_COL;
+                        col = m_earthColour;
 
                     List<Vector2> points = poly.Points;
                     int[] tris = poly.Tris;
@@ -270,6 +329,9 @@ namespace Terrain.Debugging
             GL.End();
         }
 
+        /// <summary>
+        /// Renders all the mesh and lip vertices as GL quads with lips as GL lines
+        /// </summary>
         private void RenderVertices()
         {
             GL.Begin(GL.LINES);
