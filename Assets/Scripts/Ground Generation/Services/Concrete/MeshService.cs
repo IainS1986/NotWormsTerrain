@@ -7,12 +7,12 @@ namespace Terrain.Services.Concrete
 {
     public class MeshService : IMeshService
     {
-        private static Material[] Materials = new Material[2];
-        private static Material[] Materials_Lips = new Material[2];
+        protected static Material[] Materials = new Material[2];
+        protected static Material[] Materials_Lips = new Material[2];
 
-        private static float sLipDepth = 5;
-        private static float sLipOverhang = -0.1f;
-        private static float sLipSize = 1;
+        protected static float sLipDepth = 5;
+        protected static float sLipOverhang = -0.1f;
+        protected static float sLipSize = 1;
 
         public MeshService()
         {
@@ -123,7 +123,7 @@ namespace Terrain.Services.Concrete
             }
         }
 
-        private void BuildLipForContour(GroundChunk chunk, VertexSequence contour, Material material)
+        protected virtual void BuildLipForContour(GroundChunk chunk, VertexSequence contour, Material material)
         {
             Mesh lip = new Mesh();
             lip.name = "GroundChunkLipMesh";
