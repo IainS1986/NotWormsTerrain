@@ -116,7 +116,28 @@ namespace Terrain.Debugging
             Rect boundary = DebugButton.GetBrushWidgetRect();
             GUI.Box(boundary, "BRUSH");
 
-            int i = 1;
+            //Render +/- size UI
+            GUIStyle style = new GUIStyle();
+            style.alignment = TextAnchor.MiddleCenter;
+            style.normal.textColor = Color.white;
+
+            GUI.Label(new Rect(boundary.x, boundary.y + DebugButton.Height + DebugButton.Border, boundary.width, DebugButton.Height), "Size", style);
+            if(GUI.Button(new Rect(boundary.x + DebugButton.Border, boundary.y + DebugButton.Height + DebugButton.Border, DebugButton.Height, DebugButton.Height), "-"))
+            {
+                if (m_brush != Brush.NONE &&
+                    m_size > 1)
+                    m_size--;
+            }
+
+            if (GUI.Button(new Rect(boundary.x + boundary.width - DebugButton.Border - DebugButton.Height, boundary.y + DebugButton.Height + DebugButton.Border, DebugButton.Height, DebugButton.Height), "+"))
+            {
+                if (m_brush != Brush.NONE)
+                    m_size++;
+            }
+
+
+            //Render brush material buttons after +/- size buttons
+            int i = 2;
             foreach(var brush in m_brushTypes)
             {
                 DebugButton.AddButton(boundary, i++, (m_brush == brush) ? brush.ToString().ToUpper() : brush.ToString().ToLower(), () => m_brush = brush);

@@ -105,7 +105,7 @@ namespace Terrain.Debugging
         {
             int y = DebugButton.Border / 2;
 
-            int num_buttons = BrushTypes.Count();
+            int num_buttons = BrushTypes.Count() + 1;
             return DebugButton.GetWidgetRect(y, num_buttons);
         }
 
