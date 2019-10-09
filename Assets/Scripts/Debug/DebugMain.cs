@@ -85,7 +85,7 @@ namespace Terrain.Debugging
         /// </summary>
         public void Start()
         {
-            m_lineMaterial = new Material(Shader.Find("Particles/Alpha Blended"));
+            m_lineMaterial = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended"));
             m_lineMaterial.hideFlags = HideFlags.HideAndDontSave;
             m_lineMaterial.shader.hideFlags = HideFlags.HideAndDontSave;
 
@@ -114,7 +114,10 @@ namespace Terrain.Debugging
         public void OnPostRender()
         {
             // set the current material
-            m_lineMaterial.SetPass( 0 );
+            if (m_lineMaterial != null)
+            {
+                m_lineMaterial.SetPass( 0 );
+            }
 
             RenderDots();
             RenderEdges();
